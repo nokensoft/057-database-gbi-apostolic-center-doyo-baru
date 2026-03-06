@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Master | GBI Apostolic Center Doyo Baru</title>
+    <!-- Laravel equivalent: @vite(['resources/css/app.css', 'resources/js/app.js']) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#1e293b', secondary: '#334155', accent: '#2563eb', bgMain: '#f8fafc' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../../css/app.css">
+    <script src="../../js/app.js"></script>
+    <style>* { border-radius: 0 !important; }</style>
+</head>
+<!--
+    Laravel equivalent:
+    @extends('layouts.app')
+    @section('role', 'admin-master')
+-->
+<body class="antialiased text-slate-800" x-data="adminMasterApp()">
+<div class="flex min-h-screen">
+
+    <!-- ============================================ -->
+    <!-- Partial: Sidebar -->
+    <!-- Laravel equivalent: @include('partials.sidebar', ['role' => 'admin-master']) -->
+    <!-- ============================================ -->
+    <template x-if="true">
+        <div>
+            <!-- Mobile Overlay -->
+            <div x-show="sidebarOpen" @click="sidebarOpen = false"
+                 class="sidebar-overlay md:hidden" x-transition.opacity></div>
+
+            <aside class="sidebar fixed md:sticky top-0 z-50 md:z-auto"
+                   :class="sidebarOpen ? 'open' : ''">
+                <!-- Brand -->
+                <div class="sidebar-brand flex items-center gap-3">
+                    <div class="w-9 h-9 bg-accent flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <span class="text-white font-bold text-sm tracking-tight">ADMIN MASTER</span>
+                        <p class="text-[10px] text-slate-500">Nokensoft Developer</p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="sidebar-nav mt-4">
+                    <div class="sidebar-section-title">Menu Utama</div>
+
+                    <button @click="page = 'dashboard'" :class="page === 'dashboard' ? 'active' : ''">
+                        <i class="fa-solid fa-gauge w-5 text-center"></i> Dashboard
+                    </button>
+                    <button @click="page = 'konfigurasi'" :class="page === 'konfigurasi' ? 'active' : ''">
+                        <i class="fa-solid fa-gears w-5 text-center"></i> Konfigurasi Sistem
+                    </button>
+                    <button @click="page = 'pengguna'" :class="page === 'pengguna' ? 'active' : ''">
+                        <i class="fa-solid fa-users-gear w-5 text-center"></i> Manajemen Pengguna
+                    </button>
+
+                    <div class="sidebar-section-title">Keamanan</div>
+
+                    <button @click="page = 'keamanan'" :class="page === 'keamanan' ? 'active' : ''">
+                        <i class="fa-solid fa-lock w-5 text-center"></i> Hak Akses & Enkripsi
+                    </button>
+                    <button @click="page = 'backup'" :class="page === 'backup' ? 'active' : ''">
+                        <i class="fa-solid fa-database w-5 text-center"></i> Backup & Recovery
+                    </button>
+                    <button @click="page = 'log'" :class="page === 'log' ? 'active' : ''">
+                        <i class="fa-solid fa-clipboard-list w-5 text-center"></i> Log Audit
+                    </button>
+
+                    <div class="sidebar-section-title">Lainnya</div>
+
+                    <a href="../auth/login.html">
+                        <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Keluar
+                    </a>
+                </nav>
+            </aside>
+        </div>
+    </template>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+        <!-- ============================================ -->
+        <!-- Partial: Topbar / Header -->
+        <!-- Laravel equivalent: @include('partials.topbar') -->
+        <!-- ============================================ -->
+        <template x-if="true">
+            <header class="topbar sticky top-0 z-30">
+                <div class="flex items-center gap-4">
+                    <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-primary">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div>
+                        <h1 class="font-bold text-sm uppercase tracking-wider" x-text="pageTitle"></h1>
+                        <p class="text-[10px] text-slate-400">GBI Apostolic Center Doyo Baru</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="relative text-slate-400 hover:text-primary">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 text-white text-[8px] flex items-center justify-center">3</span>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-primary text-white flex items-center justify-center text-xs font-bold">AM</div>
+                        <div class="hidden sm:block">
+                            <p class="text-xs font-bold">Admin Master</p>
+                            <p class="text-[10px] text-slate-400">Developer</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </template>
+
+        <!-- Content -->
+        <main class="flex-1 p-6 bg-bgMain">
+
+            <!-- ============================================ -->
+            <!-- Page: Dashboard -->
+            <!-- Laravel equivalent: @include('admin-master.dashboard') -->
+            <!-- Route: /admin-master/dashboard -->
+            <!-- ============================================ -->
+            <div x-show="page === 'dashboard'" x-transition>
+
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Total Pengguna</p>
+                            <p class="stat-value">48</p>
+                        </div>
+                        <i class="fa-solid fa-users stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Database Size</p>
+                            <p class="stat-value">2.4 GB</p>
+                        </div>
+                        <i class="fa-solid fa-database stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Uptime</p>
+                            <p class="stat-value">99.8%</p>
+                        </div>
+                        <i class="fa-solid fa-server stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Backup Terakhir</p>
+                            <p class="stat-value text-lg">06 Mar</p>
+                        </div>
+                        <i class="fa-solid fa-cloud-arrow-up stat-icon"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- System Status -->
+                    <div class="card lg:col-span-2">
+                        <div class="card-header">Status Sistem</div>
+                        <div class="card-body">
+                            <div class="space-y-3">
+                                <template x-for="item in systemStatus" :key="item.name">
+                                    <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                                        <div class="flex items-center gap-3">
+                                            <i class="fa-solid fa-circle text-[8px]"
+                                               :class="item.status === 'online' ? 'text-green-500' : 'text-red-500'"></i>
+                                            <span class="text-sm" x-text="item.name"></span>
+                                        </div>
+                                        <span class="badge" :class="item.status === 'online' ? 'badge-success' : 'badge-danger'"
+                                              x-text="item.status"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">Aksi Cepat</div>
+                        <div class="card-body space-y-2">
+                            <button @click="page = 'backup'" class="btn btn-outline-dark w-full justify-start">
+                                <i class="fa-solid fa-download w-5"></i> Backup Database
+                            </button>
+                            <button @click="page = 'pengguna'" class="btn btn-outline-dark w-full justify-start">
+                                <i class="fa-solid fa-user-plus w-5"></i> Tambah Pengguna
+                            </button>
+                            <button @click="page = 'log'" class="btn btn-outline-dark w-full justify-start">
+                                <i class="fa-solid fa-eye w-5"></i> Lihat Log Audit
+                            </button>
+                            <button @click="page = 'konfigurasi'" class="btn btn-outline-dark w-full justify-start">
+                                <i class="fa-solid fa-wrench w-5"></i> Pengaturan Sistem
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card mt-6">
+                    <div class="card-header">Aktivitas Sistem Terkini</div>
+                    <div class="card-body">
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Waktu</th>
+                                        <th>Pengguna</th>
+                                        <th>Aktivitas</th>
+                                        <th>IP Address</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="log in recentLogs" :key="log.id">
+                                        <tr>
+                                            <td class="text-xs text-slate-500" x-text="log.time"></td>
+                                            <td x-text="log.user"></td>
+                                            <td x-text="log.action"></td>
+                                            <td class="font-mono text-xs" x-text="log.ip"></td>
+                                            <td><span class="badge" :class="'badge-' + log.statusType" x-text="log.status"></span></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Konfigurasi Sistem -->
+            <!-- Laravel equivalent: @include('admin-master.konfigurasi') -->
+            <!-- Route: /admin-master/konfigurasi -->
+            <!-- ============================================ -->
+            <div x-show="page === 'konfigurasi'" x-transition>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Site Settings -->
+                    <div class="card">
+                        <div class="card-header"><i class="fa-solid fa-globe mr-2"></i>Pengaturan Situs</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">Nama Gereja</label>
+                                <input type="text" class="form-input" value="GBI Apostolic Center Doyo Baru">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Alamat</label>
+                                <textarea class="form-textarea" rows="2">Jl. Raya Doyo Baru, Sentani, Jayapura</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email Kontak</label>
+                                <input type="email" class="form-input" value="info@gbi-doyo.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Telepon</label>
+                                <input type="text" class="form-input" value="+62 967 xxxxxx">
+                            </div>
+                            <button class="btn btn-dark"><i class="fa-solid fa-save"></i> Simpan Pengaturan</button>
+                        </div>
+                    </div>
+
+                    <!-- Database Config -->
+                    <div class="card">
+                        <div class="card-header"><i class="fa-solid fa-database mr-2"></i>Konfigurasi Database</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">DB Host</label>
+                                <input type="text" class="form-input" value="localhost" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">DB Name</label>
+                                <input type="text" class="form-input" value="db_gbi_apostolic" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">DB Driver</label>
+                                <select class="form-select">
+                                    <option selected>MySQL 8.0</option>
+                                    <option>PostgreSQL 15</option>
+                                    <option>SQLite</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Charset</label>
+                                <input type="text" class="form-input" value="utf8mb4" disabled>
+                            </div>
+                            <div class="alert alert-info">
+                                <i class="fa-solid fa-info-circle mr-1"></i>
+                                Konfigurasi database dikelola via file <code>.env</code> pada server.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Mode -->
+                    <div class="card">
+                        <div class="card-header"><i class="fa-solid fa-tools mr-2"></i>Mode Pemeliharaan</div>
+                        <div class="card-body">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <p class="text-sm font-bold">Maintenance Mode</p>
+                                    <p class="text-xs text-slate-500">Nonaktifkan akses publik saat pemeliharaan</p>
+                                </div>
+                                <button class="btn btn-sm"
+                                        :class="maintenanceMode ? 'btn-danger' : 'btn-outline-dark'"
+                                        @click="maintenanceMode = !maintenanceMode"
+                                        x-text="maintenanceMode ? 'AKTIF' : 'NONAKTIF'"></button>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Pesan Pemeliharaan</label>
+                                <textarea class="form-textarea" rows="3">Sistem sedang dalam pemeliharaan. Silakan coba lagi nanti.</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Software Update -->
+                    <div class="card">
+                        <div class="card-header"><i class="fa-solid fa-arrow-up-right-dots mr-2"></i>Pembaruan Sistem</div>
+                        <div class="card-body">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <p class="text-sm font-bold">Versi Saat Ini</p>
+                                    <p class="text-xs text-slate-500">v1.0.0 — Build 2026.03.06</p>
+                                </div>
+                                <span class="badge badge-success">Terbaru</span>
+                            </div>
+                            <button class="btn btn-outline-dark w-full justify-center">
+                                <i class="fa-solid fa-rotate"></i> Periksa Pembaruan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Manajemen Pengguna -->
+            <!-- Laravel equivalent: @include('admin-master.pengguna') -->
+            <!-- Route: /admin-master/pengguna -->
+            <!-- ============================================ -->
+            <div x-show="page === 'pengguna'" x-transition>
+                <div class="card">
+                    <div class="card-header flex items-center justify-between">
+                        <span><i class="fa-solid fa-users-gear mr-2"></i>Daftar Pengguna</span>
+                        <button class="btn btn-dark btn-sm" @click="modalPengguna = true">
+                            <i class="fa-solid fa-plus"></i> Tambah Pengguna
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Search & Filter -->
+                        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                            <input type="text" class="form-input sm:max-w-xs" placeholder="Cari pengguna..."
+                                   x-model="penggunaSearch">
+                            <select class="form-select sm:max-w-[200px]" x-model="penggunaFilter">
+                                <option value="">Semua Role</option>
+                                <option value="admin-master">Admin Master</option>
+                                <option value="manager">Manager</option>
+                                <option value="operator">Operator</option>
+                            </select>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nama</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Login Terakhir</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(user, i) in filteredPengguna" :key="user.id">
+                                        <tr>
+                                            <td x-text="i + 1"></td>
+                                            <td class="font-semibold" x-text="user.name"></td>
+                                            <td x-text="user.email"></td>
+                                            <td><span class="badge badge-info" x-text="user.role"></span></td>
+                                            <td>
+                                                <span class="badge" :class="user.active ? 'badge-success' : 'badge-danger'"
+                                                      x-text="user.active ? 'Aktif' : 'Nonaktif'"></span>
+                                            </td>
+                                            <td class="text-xs text-slate-500" x-text="user.lastLogin"></td>
+                                            <td>
+                                                <div class="flex gap-1">
+                                                    <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-pen"></i></button>
+                                                    <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-key"></i></button>
+                                                    <button class="btn btn-outline-dark btn-sm text-red-600"><i class="fa-solid fa-trash"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal: Tambah Pengguna -->
+                <template x-if="modalPengguna">
+                    <div class="modal-backdrop" @click.self="modalPengguna = false">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="font-bold text-sm uppercase">Tambah Pengguna Baru</h3>
+                                <button @click="modalPengguna = false" class="text-slate-400 hover:text-primary">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="form-label">Nama Lengkap</label>
+                                    <input type="text" class="form-input" placeholder="Masukkan nama lengkap">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-input" placeholder="email@gbi-doyo.com">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Role</label>
+                                    <select class="form-select">
+                                        <option value="">Pilih Role</option>
+                                        <option value="admin-master">Admin Master</option>
+                                        <option value="manager">Manager</option>
+                                        <option value="operator">Operator</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Password</label>
+                                        <input type="password" class="form-input" placeholder="••••••••">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Konfirmasi Password</label>
+                                        <input type="password" class="form-input" placeholder="••••••••">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-dark btn-sm" @click="modalPengguna = false">Batal</button>
+                                <button class="btn btn-dark btn-sm"><i class="fa-solid fa-save"></i> Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Keamanan & Hak Akses -->
+            <!-- Laravel equivalent: @include('admin-master.keamanan') -->
+            <!-- Route: /admin-master/keamanan -->
+            <!-- ============================================ -->
+            <div x-show="page === 'keamanan'" x-transition>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Role Permissions -->
+                    <div class="card lg:col-span-2">
+                        <div class="card-header"><i class="fa-solid fa-user-shield mr-2"></i>Matriks Hak Akses</div>
+                        <div class="card-body">
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Modul / Fitur</th>
+                                            <th class="text-center">Admin Master</th>
+                                            <th class="text-center">Manager</th>
+                                            <th class="text-center">Operator</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="perm in permissions" :key="perm.module">
+                                            <tr>
+                                                <td class="font-semibold" x-text="perm.module"></td>
+                                                <td class="text-center">
+                                                    <i class="fa-solid" :class="perm.admin ? 'fa-check text-green-600' : 'fa-xmark text-red-400'"></i>
+                                                </td>
+                                                <td class="text-center">
+                                                    <i class="fa-solid" :class="perm.manager ? 'fa-check text-green-600' : 'fa-xmark text-red-400'"></i>
+                                                </td>
+                                                <td class="text-center">
+                                                    <i class="fa-solid" :class="perm.operator ? 'fa-check text-green-600' : 'fa-xmark text-red-400'"></i>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Encryption Settings -->
+                    <div class="card">
+                        <div class="card-header"><i class="fa-solid fa-shield-halved mr-2"></i>Enkripsi Data</div>
+                        <div class="card-body">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-bold">Enkripsi Password</p>
+                                        <p class="text-xs text-slate-500">Bcrypt hashing algorithm</p>
+                                    </div>
+                                    <span class="badge badge-success">Aktif</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-bold">SSL/TLS</p>
+                                        <p class="text-xs text-slate-500">HTTPS encryption</p>
+                                    </div>
+                                    <span class="badge badge-success">Aktif</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-bold">Data at Rest Encryption</p>
+                                        <p class="text-xs text-slate-500">AES-256 database encryption</p>
+                                    </div>
+                                    <span class="badge badge-warning">Konfigurasi</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Session Security -->
+                    <div class="card">
+                        <div class="card-header"><i class="fa-solid fa-clock mr-2"></i>Keamanan Sesi</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">Session Timeout (menit)</label>
+                                <input type="number" class="form-input" value="30">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Max Login Attempts</label>
+                                <input type="number" class="form-input" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Lockout Duration (menit)</label>
+                                <input type="number" class="form-input" value="15">
+                            </div>
+                            <button class="btn btn-dark"><i class="fa-solid fa-save"></i> Simpan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Backup & Recovery -->
+            <!-- Laravel equivalent: @include('admin-master.backup') -->
+            <!-- Route: /admin-master/backup -->
+            <!-- ============================================ -->
+            <div x-show="page === 'backup'" x-transition>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Backup Actions -->
+                    <div class="card">
+                        <div class="card-header"><i class="fa-solid fa-cloud-arrow-up mr-2"></i>Buat Backup</div>
+                        <div class="card-body space-y-3">
+                            <button class="btn btn-dark w-full justify-center" @click="createBackup('full')">
+                                <i class="fa-solid fa-database"></i> Backup Database (SQL)
+                            </button>
+                            <button class="btn btn-outline-dark w-full justify-center" @click="createBackup('files')">
+                                <i class="fa-solid fa-folder"></i> Backup Files
+                            </button>
+                            <button class="btn btn-outline-dark w-full justify-center" @click="createBackup('all')">
+                                <i class="fa-solid fa-box-archive"></i> Backup Lengkap
+                            </button>
+                            <div class="divider"></div>
+                            <div class="form-group">
+                                <label class="form-label">Jadwal Backup Otomatis</label>
+                                <select class="form-select">
+                                    <option>Setiap Hari (00:00)</option>
+                                    <option>Setiap Minggu (Senin 00:00)</option>
+                                    <option>Setiap Bulan (Tanggal 1)</option>
+                                    <option>Nonaktif</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backup History -->
+                    <div class="card lg:col-span-2">
+                        <div class="card-header"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Riwayat Backup</div>
+                        <div class="card-body">
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tanggal</th>
+                                            <th>Nama File</th>
+                                            <th>Ukuran</th>
+                                            <th>Tipe</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="b in backups" :key="b.id">
+                                            <tr>
+                                                <td class="text-xs" x-text="b.date"></td>
+                                                <td class="font-mono text-xs" x-text="b.filename"></td>
+                                                <td x-text="b.size"></td>
+                                                <td><span class="badge badge-info" x-text="b.type"></span></td>
+                                                <td>
+                                                    <div class="flex gap-1">
+                                                        <button class="btn btn-outline-dark btn-sm" title="Download">
+                                                            <i class="fa-solid fa-download"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-dark btn-sm" title="Restore">
+                                                            <i class="fa-solid fa-rotate-left"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-dark btn-sm text-red-600" title="Hapus">
+                                                            <i class="fa-solid fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recovery -->
+                    <div class="card lg:col-span-3">
+                        <div class="card-header"><i class="fa-solid fa-upload mr-2"></i>Restore dari File</div>
+                        <div class="card-body">
+                            <div class="alert alert-warning">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                                <strong>Perhatian:</strong> Proses restore akan menimpa data yang ada saat ini. Pastikan Anda telah membuat backup sebelum melakukan restore.
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-4 items-end">
+                                <div class="form-group flex-1 mb-0">
+                                    <label class="form-label">Upload File SQL</label>
+                                    <input type="file" class="form-input" accept=".sql,.gz,.zip">
+                                </div>
+                                <button class="btn btn-danger"><i class="fa-solid fa-rotate-left"></i> Restore Database</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Log Audit -->
+            <!-- Laravel equivalent: @include('admin-master.log-audit') -->
+            <!-- Route: /admin-master/log-audit -->
+            <!-- ============================================ -->
+            <div x-show="page === 'log'" x-transition>
+                <div class="card">
+                    <div class="card-header flex items-center justify-between">
+                        <span><i class="fa-solid fa-clipboard-list mr-2"></i>Log Audit Sistem</span>
+                        <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-file-export"></i> Export Log</button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filters -->
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
+                            <input type="text" class="form-input" placeholder="Cari aktivitas..." x-model="logSearch">
+                            <select class="form-select" x-model="logFilterType">
+                                <option value="">Semua Tipe</option>
+                                <option value="auth">Autentikasi</option>
+                                <option value="crud">Data CRUD</option>
+                                <option value="system">Sistem</option>
+                                <option value="backup">Backup</option>
+                            </select>
+                            <input type="date" class="form-input" x-model="logFilterDate">
+                            <select class="form-select" x-model="logFilterUser">
+                                <option value="">Semua Pengguna</option>
+                                <option>Admin Master</option>
+                                <option>Manager A</option>
+                                <option>Operator 1</option>
+                            </select>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Timestamp</th>
+                                        <th>Pengguna</th>
+                                        <th>Tipe</th>
+                                        <th>Aktivitas</th>
+                                        <th>IP Address</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(log, i) in auditLogs" :key="log.id">
+                                        <tr>
+                                            <td x-text="i + 1"></td>
+                                            <td class="text-xs font-mono" x-text="log.timestamp"></td>
+                                            <td x-text="log.user"></td>
+                                            <td><span class="badge badge-info" x-text="log.type"></span></td>
+                                            <td x-text="log.action"></td>
+                                            <td class="font-mono text-xs" x-text="log.ip"></td>
+                                            <td>
+                                                <span class="badge" :class="'badge-' + log.statusType" x-text="log.status"></span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pagination mt-4">
+                            <a href="#">&laquo;</a>
+                            <span class="active">1</span>
+                            <a href="#">2</a>
+                            <a href="#">3</a>
+                            <a href="#">&raquo;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ============================================ -->
+        <!-- Partial: Footer -->
+        <!-- Laravel equivalent: @include('partials.footer') -->
+        <!-- ============================================ -->
+        <template x-if="true">
+            <footer class="bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between text-[10px] text-slate-400 uppercase tracking-widest">
+                <span>&copy; 2026 GBI Apostolic Center Doyo Baru</span>
+                <span>Developed by Nokensoft.com</span>
+            </footer>
+        </template>
+
+    </div>
+</div>
+
+<script>
+function adminMasterApp() {
+    return {
+        page: 'dashboard',
+        sidebarOpen: false,
+        maintenanceMode: false,
+        modalPengguna: false,
+
+        // Filter states
+        penggunaSearch: '',
+        penggunaFilter: '',
+        logSearch: '',
+        logFilterType: '',
+        logFilterDate: '',
+        logFilterUser: '',
+
+        get pageTitle() {
+            const titles = {
+                dashboard: 'Dashboard',
+                konfigurasi: 'Konfigurasi Sistem',
+                pengguna: 'Manajemen Pengguna',
+                keamanan: 'Keamanan & Hak Akses',
+                backup: 'Backup & Recovery',
+                log: 'Log Audit'
+            };
+            return titles[this.page] || 'Dashboard';
+        },
+
+        // ---- Data: System Status ----
+        systemStatus: [
+            { name: 'Web Server (Nginx)', status: 'online' },
+            { name: 'Database (MySQL 8.0)', status: 'online' },
+            { name: 'Cache (Redis)', status: 'online' },
+            { name: 'Queue Worker', status: 'online' },
+            { name: 'Cron Scheduler', status: 'online' },
+        ],
+
+        // ---- Data: Recent Logs ----
+        recentLogs: [
+            { id: 1, time: '06 Mar 2026, 14:22', user: 'Admin Master', action: 'Login berhasil', ip: '192.168.1.10', status: 'Sukses', statusType: 'success' },
+            { id: 2, time: '06 Mar 2026, 13:50', user: 'Operator 1', action: 'Tambah data jemaat baru', ip: '192.168.1.15', status: 'Sukses', statusType: 'success' },
+            { id: 3, time: '06 Mar 2026, 12:30', user: 'Manager A', action: 'Export laporan keuangan', ip: '192.168.1.20', status: 'Sukses', statusType: 'success' },
+            { id: 4, time: '06 Mar 2026, 10:15', user: 'System', action: 'Auto backup database', ip: 'localhost', status: 'Sukses', statusType: 'success' },
+            { id: 5, time: '05 Mar 2026, 23:00', user: 'Unknown', action: 'Login gagal (3x)', ip: '103.45.67.89', status: 'Gagal', statusType: 'danger' },
+        ],
+
+        // ---- Data: Pengguna ----
+        pengguna: [
+            { id: 1, name: 'Super Admin', email: 'admin@nokensoft.com', role: 'admin-master', active: true, lastLogin: '06 Mar 2026, 14:22' },
+            { id: 2, name: 'Pdt. Yohanes', email: 'yohanes@gbi-doyo.com', role: 'manager', active: true, lastLogin: '06 Mar 2026, 09:00' },
+            { id: 3, name: 'Maria S.', email: 'maria@gbi-doyo.com', role: 'operator', active: true, lastLogin: '05 Mar 2026, 16:30' },
+            { id: 4, name: 'Budi K.', email: 'budi@gbi-doyo.com', role: 'operator', active: true, lastLogin: '04 Mar 2026, 11:45' },
+            { id: 5, name: 'Sarah P.', email: 'sarah@gbi-doyo.com', role: 'operator', active: false, lastLogin: '01 Feb 2026, 08:00' },
+        ],
+
+        get filteredPengguna() {
+            return this.pengguna.filter(u => {
+                const matchSearch = !this.penggunaSearch || u.name.toLowerCase().includes(this.penggunaSearch.toLowerCase()) || u.email.toLowerCase().includes(this.penggunaSearch.toLowerCase());
+                const matchFilter = !this.penggunaFilter || u.role === this.penggunaFilter;
+                return matchSearch && matchFilter;
+            });
+        },
+
+        // ---- Data: Permissions ----
+        permissions: [
+            { module: 'Konfigurasi Sistem', admin: true, manager: false, operator: false },
+            { module: 'Manajemen Pengguna', admin: true, manager: false, operator: false },
+            { module: 'Backup & Recovery', admin: true, manager: false, operator: false },
+            { module: 'Log Audit', admin: true, manager: true, operator: false },
+            { module: 'Dashboard Laporan', admin: true, manager: true, operator: false },
+            { module: 'Keuangan & Inventaris', admin: true, manager: true, operator: false },
+            { module: 'Approval Data', admin: true, manager: true, operator: false },
+            { module: 'Data Jemaat (CRUD)', admin: true, manager: true, operator: true },
+            { module: 'Absensi / Kehadiran', admin: true, manager: true, operator: true },
+            { module: 'Pelayanan', admin: true, manager: true, operator: true },
+            { module: 'Surat Menyurat', admin: true, manager: false, operator: true },
+        ],
+
+        // ---- Data: Backups ----
+        backups: [
+            { id: 1, date: '06 Mar 2026, 00:00', filename: 'db_gbi_apostolic_2026_03_06_00_00_00.sql', size: '245 MB', type: 'Database' },
+            { id: 2, date: '05 Mar 2026, 00:00', filename: 'db_gbi_apostolic_2026_03_05_00_00_00.sql', size: '244 MB', type: 'Database' },
+            { id: 3, date: '04 Mar 2026, 00:00', filename: 'db_gbi_apostolic_2026_03_04_00_00_00.sql', size: '243 MB', type: 'Database' },
+            { id: 4, date: '01 Mar 2026, 12:00', filename: 'full_backup_2026_03_01_12_00_00.zip', size: '1.2 GB', type: 'Lengkap' },
+        ],
+
+        // ---- Data: Audit Logs ----
+        auditLogs: [
+            { id: 1, timestamp: '2026-03-06 14:22:15', user: 'Admin Master', type: 'auth', action: 'Login berhasil', ip: '192.168.1.10', status: 'Sukses', statusType: 'success' },
+            { id: 2, timestamp: '2026-03-06 13:50:30', user: 'Operator 1', type: 'crud', action: 'INSERT jemaat: Budi Santoso', ip: '192.168.1.15', status: 'Sukses', statusType: 'success' },
+            { id: 3, timestamp: '2026-03-06 12:30:00', user: 'Manager A', type: 'system', action: 'Export laporan keuangan Q1', ip: '192.168.1.20', status: 'Sukses', statusType: 'success' },
+            { id: 4, timestamp: '2026-03-06 10:15:00', user: 'System', type: 'backup', action: 'Auto backup database completed', ip: '127.0.0.1', status: 'Sukses', statusType: 'success' },
+            { id: 5, timestamp: '2026-03-05 23:00:45', user: 'Unknown', type: 'auth', action: 'Login gagal - brute force detected', ip: '103.45.67.89', status: 'Gagal', statusType: 'danger' },
+            { id: 6, timestamp: '2026-03-05 18:20:10', user: 'Operator 1', type: 'crud', action: 'UPDATE jemaat: mutasi keluarga #45', ip: '192.168.1.15', status: 'Sukses', statusType: 'success' },
+            { id: 7, timestamp: '2026-03-05 15:10:00', user: 'Admin Master', type: 'system', action: 'Ubah konfigurasi session timeout', ip: '192.168.1.10', status: 'Sukses', statusType: 'success' },
+        ],
+
+        // ---- Methods ----
+        createBackup(type) {
+            const now = new Date();
+            const ts = now.toISOString().replace(/[-:T]/g, '_').split('.')[0];
+            const filename = type === 'full' ? `db_gbi_apostolic_${ts}.sql` : `${type}_backup_${ts}.zip`;
+            alert(`Membuat backup: ${filename}\n\nProses backup sedang berjalan...`);
+        }
+    };
+}
+</script>
+</body>
+</html>

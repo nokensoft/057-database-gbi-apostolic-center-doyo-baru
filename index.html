@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Database | GBI Apostolic Center Doyo Baru</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#1e293b', secondary: '#334155', accent: '#2563eb', bgMain: '#f8fafc' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="resources/css/app.css">
+    <style>* { border-radius: 0 !important; }</style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 antialiased">
+
+    <!-- Header -->
+    <header class="bg-primary text-white">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-accent flex items-center justify-center">
+                    <i class="fa-solid fa-church text-white"></i>
+                </div>
+                <div>
+                    <span class="font-bold tracking-tight text-sm md:text-lg uppercase">GBI Apostolic Center</span>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest">Doyo Baru — Sistem Informasi Database</p>
+                </div>
+            </div>
+            <a href="resources/views/auth/login.html" class="btn btn-accent">
+                <i class="fa-solid fa-right-to-bracket"></i> Masuk
+            </a>
+        </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="bg-primary text-white py-20 px-6">
+        <div class="container mx-auto text-center max-w-2xl">
+            <h1 class="text-3xl md:text-4xl font-bold uppercase tracking-wider mb-4">Sistem Informasi Database</h1>
+            <p class="text-sm text-slate-400 leading-relaxed mb-8">
+                Platform terintegrasi untuk manajemen data jemaat, keuangan gereja, pelayanan,
+                dan administrasi GBI Apostolic Center Doyo Baru.
+            </p>
+            <a href="resources/views/auth/login.html" class="btn btn-accent text-sm px-6 py-3">
+                <i class="fa-solid fa-right-to-bracket"></i> Masuk ke Sistem
+            </a>
+        </div>
+    </section>
+
+    <!-- Role Cards -->
+    <section class="container mx-auto px-6 -mt-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Admin Master -->
+            <a href="resources/views/admin-master/index.html" class="card hover:shadow-lg transition p-6 group">
+                <div class="w-12 h-12 bg-slate-100 flex items-center justify-center mb-4 group-hover:bg-accent transition">
+                    <i class="fa-solid fa-shield-halved text-accent group-hover:text-white transition"></i>
+                </div>
+                <h3 class="font-bold uppercase tracking-wider text-sm mb-2">Admin Master</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Manajemen sistem, konfigurasi database, keamanan, backup & recovery, dan log audit.
+                </p>
+                <div class="mt-4 text-xs font-bold text-accent uppercase tracking-wider">
+                    Developer / Nokensoft <i class="fa-solid fa-arrow-right ml-1"></i>
+                </div>
+            </a>
+
+            <!-- Manager -->
+            <a href="resources/views/manager/index.html" class="card hover:shadow-lg transition p-6 group">
+                <div class="w-12 h-12 bg-slate-100 flex items-center justify-center mb-4 group-hover:bg-accent transition">
+                    <i class="fa-solid fa-chart-pie text-accent group-hover:text-white transition"></i>
+                </div>
+                <h3 class="font-bold uppercase tracking-wider text-sm mb-2">Manager</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Dashboard eksekutif, laporan keuangan, inventaris, approval data, dan perencanaan program.
+                </p>
+                <div class="mt-4 text-xs font-bold text-accent uppercase tracking-wider">
+                    Pendeta / Gembala <i class="fa-solid fa-arrow-right ml-1"></i>
+                </div>
+            </a>
+
+            <!-- Operator -->
+            <a href="resources/views/operator/index.html" class="card hover:shadow-lg transition p-6 group">
+                <div class="w-12 h-12 bg-slate-100 flex items-center justify-center mb-4 group-hover:bg-accent transition">
+                    <i class="fa-solid fa-keyboard text-accent group-hover:text-white transition"></i>
+                </div>
+                <h3 class="font-bold uppercase tracking-wider text-sm mb-2">Operator</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Pendaftaran jemaat, absensi ibadah, administrasi pelayanan, dan surat menyurat.
+                </p>
+                <div class="mt-4 text-xs font-bold text-accent uppercase tracking-wider">
+                    Staff Administrasi <i class="fa-solid fa-arrow-right ml-1"></i>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Overview -->
+    <section class="container mx-auto px-6 py-16">
+        <h2 class="text-xl font-bold mb-8 border-l-4 border-accent pl-4 uppercase tracking-wider">Fitur Utama</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="flex items-start gap-3">
+                <i class="fa-solid fa-users text-accent mt-1"></i>
+                <div>
+                    <p class="text-sm font-bold">CRM Jemaat</p>
+                    <p class="text-xs text-slate-500">Pendaftaran, mutasi, dan pemutakhiran data jemaat</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3">
+                <i class="fa-solid fa-clipboard-check text-accent mt-1"></i>
+                <div>
+                    <p class="text-sm font-bold">Absensi Digital</p>
+                    <p class="text-xs text-slate-500">Pencatatan kehadiran ibadah, SM, dan komsel</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3">
+                <i class="fa-solid fa-money-bill-trend-up text-accent mt-1"></i>
+                <div>
+                    <p class="text-sm font-bold">Keuangan</p>
+                    <p class="text-xs text-slate-500">Laporan pemasukan, pengeluaran, dan inventaris aset</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3">
+                <i class="fa-solid fa-envelope-open-text text-accent mt-1"></i>
+                <div>
+                    <p class="text-sm font-bold">Surat Menyurat</p>
+                    <p class="text-xs text-slate-500">Cetak surat baptis, keanggotaan, dan pindah</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-slate-400 py-10 px-6">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div>
+                <h4 class="text-white font-bold mb-4 uppercase tracking-widest text-sm">Tentang Sistem</h4>
+                <p class="text-xs leading-relaxed">Sistem Informasi Database GBI Apostolic Center Doyo Baru dirancang untuk sinkronisasi data jemaat yang akurat dan transparan.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 uppercase tracking-widest text-sm">Struktur Template</h4>
+                <ul class="text-xs space-y-2 font-mono">
+                    <li class="text-slate-500">resources/css/app.css</li>
+                    <li class="text-slate-500">resources/js/app.js</li>
+                    <li class="text-slate-500">resources/views/auth/</li>
+                    <li class="text-slate-500">resources/views/admin-master/</li>
+                    <li class="text-slate-500">resources/views/manager/</li>
+                    <li class="text-slate-500">resources/views/operator/</li>
+                </ul>
+            </div>
+            <div class="flex flex-col items-start md:items-end">
+                <img src="https://placehold.co/150x50/31343C/FFF" alt="Developer Logo" class="mb-4 grayscale">
+                <p class="text-[10px] text-slate-500 uppercase tracking-tighter text-right">Developed by<br><span class="text-slate-300">Nokensoft.com</span></p>
+            </div>
+        </div>
+        <div class="container mx-auto mt-10 pt-6 border-t border-slate-700 text-center text-[10px] uppercase tracking-[0.2em]">
+            &copy; 2026 GBI Apostolic Center Doyo Baru. All Rights Reserved.
+        </div>
+    </footer>
+</body>
+</html>

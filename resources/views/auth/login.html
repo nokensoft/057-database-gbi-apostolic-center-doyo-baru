@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | GBI Apostolic Center Doyo Baru</title>
+    <!-- Laravel equivalent: @vite(['resources/css/app.css']) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#1e293b', secondary: '#334155', accent: '#2563eb', bgMain: '#f8fafc' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="../../css/app.css">
+    <style>* { border-radius: 0 !important; }</style>
+</head>
+<!-- Laravel equivalent: @extends('layouts.guest') / @section('content') -->
+<body class="bg-slate-100 min-h-screen flex items-center justify-center antialiased" x-data="loginPage()">
+
+    <!-- ============================================ -->
+    <!-- Partial: Notification Toast -->
+    <!-- Laravel equivalent: @include('partials.toast') -->
+    <!-- ============================================ -->
+    <template x-if="toast.show">
+        <div class="fixed top-4 right-4 z-50 alert" :class="'alert-' + toast.type"
+             x-transition x-init="setTimeout(() => toast.show = false, 3000)">
+            <span x-text="toast.message"></span>
+        </div>
+    </template>
+
+    <div class="w-full max-w-md mx-4">
+
+        <!-- ============================================ -->
+        <!-- Partial: Login Header / Brand -->
+        <!-- Laravel equivalent: @include('partials.auth-header') -->
+        <!-- ============================================ -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-primary text-white mb-4">
+                <i class="fa-solid fa-church text-2xl"></i>
+            </div>
+            <h1 class="text-xl font-bold uppercase tracking-wider text-primary">GBI Apostolic Center</h1>
+            <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">Doyo Baru — Sistem Informasi Database</p>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- Partial: Login Form -->
+        <!-- Laravel equivalent: @include('auth.partials.login-form') -->
+        <!-- ============================================ -->
+        <div class="card" x-show="view === 'login'" x-transition>
+            <div class="card-header flex items-center gap-2">
+                <i class="fa-solid fa-right-to-bracket"></i> Masuk ke Sistem
+            </div>
+            <div class="card-body">
+                <form @submit.prevent="handleLogin()">
+                    <div class="form-group">
+                        <label class="form-label">Email / Username</label>
+                        <input type="text" class="form-input" x-model="form.email" placeholder="admin@gbi-doyo.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div class="relative">
+                            <input :type="showPassword ? 'text' : 'password'" class="form-input pr-10" x-model="form.password" placeholder="••••••••" required>
+                            <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                                    @click="showPassword = !showPassword">
+                                <i class="fa-solid" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mb-6">
+                        <label class="flex items-center gap-2 text-xs text-slate-500 cursor-pointer">
+                            <input type="checkbox" x-model="form.remember" class="accent-primary"> Ingat Saya
+                        </label>
+                        <a href="#" class="text-xs text-accent hover:underline">Lupa Password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-full justify-center" :disabled="loading">
+                        <template x-if="loading"><i class="fa-solid fa-spinner fa-spin"></i></template>
+                        <span x-text="loading ? 'Memproses...' : 'Masuk'"></span>
+                    </button>
+                </form>
+
+                <div class="divider"></div>
+
+                <!-- Quick Access: Role Selection (Dev/Demo only) -->
+                <p class="text-xs text-slate-400 text-center mb-3 uppercase tracking-wider">Akses Cepat (Demo)</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <!-- <a href="../admin-master/index.html" class="btn btn-outline-dark btn-sm justify-center flex-col py-3 text-center no-underline">
+                        <i class="fa-solid fa-shield-halved text-lg mb-1"></i>
+                        <span class="text-[0.6rem]">Admin Master</span>
+                    </a> -->
+                    <a href="../manager/index.html" class="btn btn-outline-dark btn-sm justify-center flex-col py-3 text-center no-underline">
+                        <i class="fa-solid fa-chart-pie text-lg mb-1"></i>
+                        <span class="text-[0.6rem]">Manager</span>
+                    </a>
+                    <a href="../operator/index.html" class="btn btn-outline-dark btn-sm justify-center flex-col py-3 text-center no-underline">
+                        <i class="fa-solid fa-keyboard text-lg mb-1"></i>
+                        <span class="text-[0.6rem]">Operator</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- Partial: Footer -->
+        <!-- Laravel equivalent: @include('partials.auth-footer') -->
+        <!-- ============================================ -->
+        <div class="text-center mt-6">
+            <p class="text-[10px] text-slate-400 uppercase tracking-widest">
+                &copy; 2026 GBI Apostolic Center Doyo Baru
+            </p>
+            <p class="text-[10px] text-slate-300 mt-1">
+                Developed by <span class="text-slate-400">Nokensoft.com</span>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        function loginPage() {
+            return {
+                view: 'login',
+                loading: false,
+                showPassword: false,
+                form: { email: '', password: '', remember: false },
+                toast: { show: false, type: 'info', message: '' },
+
+                handleLogin() {
+                    this.loading = true;
+                    // Simulate login - replace with real API call
+                    setTimeout(() => {
+                        this.loading = false;
+                        // Demo: redirect based on email
+                        if (this.form.email.includes('admin')) {
+                            window.location.href = '../admin-master/index.html';
+                        } else if (this.form.email.includes('manager')) {
+                            window.location.href = '../manager/index.html';
+                        } else {
+                            window.location.href = '../operator/index.html';
+                        }
+                    }, 1000);
+                }
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator | GBI Apostolic Center Doyo Baru</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#1e293b', secondary: '#334155', accent: '#2563eb', bgMain: '#f8fafc' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../../css/app.css">
+    <script src="../../js/app.js"></script>
+    <style>* { border-radius: 0 !important; }</style>
+</head>
+<!--
+    Laravel equivalent:
+    @extends('layouts.app')
+    @section('role', 'operator')
+-->
+<body class="antialiased text-slate-800" x-data="operatorApp()">
+<div class="flex min-h-screen">
+
+    <!-- ============================================ -->
+    <!-- Partial: Sidebar -->
+    <!-- Laravel equivalent: @include('partials.sidebar', ['role' => 'operator']) -->
+    <!-- ============================================ -->
+    <template x-if="true">
+        <div>
+            <div x-show="sidebarOpen" @click="sidebarOpen = false"
+                 class="sidebar-overlay md:hidden" x-transition.opacity></div>
+            <aside class="sidebar fixed md:sticky top-0 z-50 md:z-auto"
+                   :class="sidebarOpen ? 'open' : ''">
+                <div class="sidebar-brand flex items-center gap-3">
+                    <div class="w-9 h-9 bg-accent flex items-center justify-center">
+                        <i class="fa-solid fa-keyboard text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <span class="text-white font-bold text-sm tracking-tight">OPERATOR</span>
+                        <p class="text-[10px] text-slate-500">GBI Apostolic Center</p>
+                    </div>
+                </div>
+                <nav class="sidebar-nav mt-4">
+                    <div class="sidebar-section-title">Menu Utama</div>
+                    <button @click="page = 'dashboard'" :class="page === 'dashboard' ? 'active' : ''">
+                        <i class="fa-solid fa-gauge w-5 text-center"></i> Dashboard
+                    </button>
+
+                    <div class="sidebar-section-title">Data Jemaat</div>
+                    <button @click="page = 'jemaat'" :class="page === 'jemaat' ? 'active' : ''">
+                        <i class="fa-solid fa-id-card w-5 text-center"></i> Pendaftaran & Data
+                    </button>
+                    <button @click="page = 'mutasi'" :class="page === 'mutasi' ? 'active' : ''">
+                        <i class="fa-solid fa-exchange-alt w-5 text-center"></i> Mutasi Jemaat
+                    </button>
+
+                    <div class="sidebar-section-title">Kegiatan</div>
+                    <button @click="page = 'absensi'" :class="page === 'absensi' ? 'active' : ''">
+                        <i class="fa-solid fa-clipboard-check w-5 text-center"></i> Absensi Kehadiran
+                    </button>
+                    <button @click="page = 'pelayanan'" :class="page === 'pelayanan' ? 'active' : ''">
+                        <i class="fa-solid fa-hand-holding-heart w-5 text-center"></i> Pelayanan
+                    </button>
+
+                    <div class="sidebar-section-title">Administrasi</div>
+                    <button @click="page = 'surat'" :class="page === 'surat' ? 'active' : ''">
+                        <i class="fa-solid fa-envelope-open-text w-5 text-center"></i> Surat Menyurat
+                    </button>
+
+                    <div class="sidebar-section-title">Lainnya</div>
+                    <a href="../auth/login.html">
+                        <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Keluar
+                    </a>
+                </nav>
+            </aside>
+        </div>
+    </template>
+
+    <div class="flex-1 flex flex-col min-w-0">
+
+        <!-- ============================================ -->
+        <!-- Partial: Topbar -->
+        <!-- Laravel equivalent: @include('partials.topbar') -->
+        <!-- ============================================ -->
+        <template x-if="true">
+            <header class="topbar sticky top-0 z-30">
+                <div class="flex items-center gap-4">
+                    <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-primary">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div>
+                        <h1 class="font-bold text-sm uppercase tracking-wider" x-text="pageTitle"></h1>
+                        <p class="text-[10px] text-slate-400">GBI Apostolic Center Doyo Baru</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="relative text-slate-400 hover:text-primary">
+                        <i class="fa-solid fa-bell"></i>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-primary text-white flex items-center justify-center text-xs font-bold">OP</div>
+                        <div class="hidden sm:block">
+                            <p class="text-xs font-bold">Maria S.</p>
+                            <p class="text-[10px] text-slate-400">Operator</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </template>
+
+        <main class="flex-1 p-6 bg-bgMain">
+
+            <!-- ============================================ -->
+            <!-- Page: Dashboard -->
+            <!-- Laravel equivalent: @include('operator.dashboard') -->
+            <!-- Route: /operator/dashboard -->
+            <!-- ============================================ -->
+            <div x-show="page === 'dashboard'" x-transition>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Total Jemaat</p>
+                            <p class="stat-value">1,240</p>
+                        </div>
+                        <i class="fa-solid fa-users stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Jemaat Baru (Bulan Ini)</p>
+                            <p class="stat-value text-green-600">18</p>
+                        </div>
+                        <i class="fa-solid fa-user-plus stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Hadir Minggu Lalu</p>
+                            <p class="stat-value">856</p>
+                        </div>
+                        <i class="fa-solid fa-person-praying stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Surat Diproses</p>
+                            <p class="stat-value">12</p>
+                        </div>
+                        <i class="fa-solid fa-envelope stat-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <h2 class="section-title">Input Data Cepat</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <button @click="page = 'jemaat'; modalJemaat = true"
+                            class="flex items-center justify-center gap-3 p-5 border-2 border-dashed border-slate-200 hover:border-accent hover:text-accent transition group card">
+                        <i class="fa-solid fa-id-card text-xl text-slate-300 group-hover:text-accent"></i>
+                        <span class="font-bold uppercase text-sm">Input Jemaat Baru</span>
+                    </button>
+                    <button @click="page = 'absensi'"
+                            class="flex items-center justify-center gap-3 p-5 border-2 border-dashed border-slate-200 hover:border-accent hover:text-accent transition group card">
+                        <i class="fa-solid fa-clipboard-check text-xl text-slate-300 group-hover:text-accent"></i>
+                        <span class="font-bold uppercase text-sm">Absensi Ibadah</span>
+                    </button>
+                    <button @click="page = 'surat'"
+                            class="flex items-center justify-center gap-3 p-5 border-2 border-dashed border-slate-200 hover:border-accent hover:text-accent transition group card">
+                        <i class="fa-solid fa-print text-xl text-slate-300 group-hover:text-accent"></i>
+                        <span class="font-bold uppercase text-sm">Cetak Surat</span>
+                    </button>
+                </div>
+
+                <!-- Recent Data Entry -->
+                <div class="card">
+                    <div class="card-header">Input Data Terkini</div>
+                    <div class="card-body">
+                        <div class="space-y-3">
+                            <template x-for="act in recentActivity" :key="act.id">
+                                <div class="flex gap-4 pb-3 border-b border-slate-50 last:border-0">
+                                    <div class="w-10 h-10 bg-slate-100 flex items-center justify-center shrink-0">
+                                        <i class="fa-solid text-accent text-xs" :class="act.icon"></i>
+                                    </div>
+                                    <div class="text-xs">
+                                        <p class="font-bold" x-text="act.title"></p>
+                                        <p class="text-slate-500" x-text="act.detail"></p>
+                                        <span class="text-[10px] text-slate-400" x-text="act.time"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Pendaftaran & Data Jemaat -->
+            <!-- Laravel equivalent: @include('operator.jemaat') -->
+            <!-- Route: /operator/jemaat -->
+            <!-- ============================================ -->
+            <div x-show="page === 'jemaat'" x-transition>
+                <div class="card">
+                    <div class="card-header flex items-center justify-between">
+                        <span><i class="fa-solid fa-id-card mr-2"></i>Data Jemaat</span>
+                        <div class="flex gap-2">
+                            <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-file-excel"></i> Export</button>
+                            <button class="btn btn-dark btn-sm" @click="modalJemaat = true">
+                                <i class="fa-solid fa-plus"></i> Tambah Jemaat
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                            <input type="text" class="form-input sm:max-w-xs" placeholder="Cari nama/NIK..."
+                                   x-model="jemaatSearch">
+                            <select class="form-select sm:max-w-[180px]" x-model="jemaatFilter">
+                                <option value="">Semua Status</option>
+                                <option value="Aktif">Aktif</option>
+                                <option value="Pindah">Pindah</option>
+                                <option value="Meninggal">Meninggal</option>
+                            </select>
+                            <select class="form-select sm:max-w-[180px]">
+                                <option value="">Semua Komsel</option>
+                                <option>Komsel Berkat</option>
+                                <option>Komsel Kasih</option>
+                                <option>Komsel Damai</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nama Lengkap</th>
+                                        <th>NIK</th>
+                                        <th>Jenis Kelamin</th>
+                                        <th>Tgl Lahir</th>
+                                        <th>Telepon</th>
+                                        <th>Komsel</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(j, i) in filteredJemaat" :key="j.id">
+                                        <tr>
+                                            <td x-text="i + 1"></td>
+                                            <td class="font-semibold" x-text="j.name"></td>
+                                            <td class="font-mono text-xs" x-text="j.nik"></td>
+                                            <td x-text="j.gender"></td>
+                                            <td class="text-xs" x-text="j.dob"></td>
+                                            <td class="text-xs" x-text="j.phone"></td>
+                                            <td><span class="badge badge-info" x-text="j.komsel"></span></td>
+                                            <td>
+                                                <span class="badge" :class="j.status === 'Aktif' ? 'badge-success' : j.status === 'Pindah' ? 'badge-warning' : 'badge-danger'"
+                                                      x-text="j.status"></span>
+                                            </td>
+                                            <td>
+                                                <div class="flex gap-1">
+                                                    <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-eye"></i></button>
+                                                    <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-pen"></i></button>
+                                                    <button class="btn btn-outline-dark btn-sm text-red-600"><i class="fa-solid fa-trash"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination mt-4">
+                            <a href="#">&laquo;</a>
+                            <span class="active">1</span>
+                            <a href="#">2</a>
+                            <a href="#">3</a>
+                            <a href="#">&raquo;</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal: Tambah Jemaat -->
+                <template x-if="modalJemaat">
+                    <div class="modal-backdrop" @click.self="modalJemaat = false">
+                        <div class="modal-content" style="max-width: 700px;">
+                            <div class="modal-header">
+                                <h3 class="font-bold text-sm uppercase">Pendaftaran Jemaat Baru</h3>
+                                <button @click="modalJemaat = false"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Nama Lengkap</label>
+                                        <input type="text" class="form-input" placeholder="Nama lengkap sesuai KTP">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">NIK (No. KTP)</label>
+                                        <input type="text" class="form-input" placeholder="16 digit NIK">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Tempat Lahir</label>
+                                        <input type="text" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Tanggal Lahir</label>
+                                        <input type="date" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Jenis Kelamin</label>
+                                        <select class="form-select">
+                                            <option>Laki-laki</option>
+                                            <option>Perempuan</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Status Pernikahan</label>
+                                        <select class="form-select">
+                                            <option>Belum Menikah</option>
+                                            <option>Menikah</option>
+                                            <option>Duda/Janda</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">No. Telepon</label>
+                                        <input type="text" class="form-input" placeholder="08xxxxxxxxxx">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Komsel / Kelompok Sel</label>
+                                        <select class="form-select">
+                                            <option value="">Pilih Komsel</option>
+                                            <option>Komsel Berkat</option>
+                                            <option>Komsel Kasih</option>
+                                            <option>Komsel Damai</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Alamat Lengkap</label>
+                                    <textarea class="form-textarea" rows="2"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Keterangan Tambahan</label>
+                                    <textarea class="form-textarea" rows="2" placeholder="Pindahan dari gereja lain, dll."></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-dark btn-sm" @click="modalJemaat = false">Batal</button>
+                                <button class="btn btn-dark btn-sm"><i class="fa-solid fa-save"></i> Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Mutasi Jemaat -->
+            <!-- Laravel equivalent: @include('operator.mutasi') -->
+            <!-- Route: /operator/mutasi -->
+            <!-- ============================================ -->
+            <div x-show="page === 'mutasi'" x-transition>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Form Mutasi -->
+                    <div class="card">
+                        <div class="card-header"><i class="fa-solid fa-exchange-alt mr-2"></i>Form Mutasi Jemaat</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">Nama Jemaat</label>
+                                <select class="form-select">
+                                    <option value="">Pilih Jemaat</option>
+                                    <template x-for="j in jemaatList" :key="j.id">
+                                        <option :value="j.id" x-text="j.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipe Mutasi</label>
+                                <select class="form-select">
+                                    <option>Masuk (Pindahan dari gereja lain)</option>
+                                    <option>Keluar (Pindah ke gereja lain)</option>
+                                    <option>Meninggal</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Gereja Asal / Tujuan</label>
+                                <input type="text" class="form-input" placeholder="Nama gereja">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tanggal Mutasi</label>
+                                <input type="date" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Keterangan</label>
+                                <textarea class="form-textarea" rows="3"></textarea>
+                            </div>
+                            <button class="btn btn-dark"><i class="fa-solid fa-paper-plane"></i> Ajukan Mutasi</button>
+                        </div>
+                    </div>
+
+                    <!-- Riwayat Mutasi -->
+                    <div class="card">
+                        <div class="card-header">Riwayat Mutasi</div>
+                        <div class="card-body">
+                            <div class="space-y-3">
+                                <template x-for="m in mutasiList" :key="m.id">
+                                    <div class="flex gap-3 pb-3 border-b border-slate-50 last:border-0">
+                                        <div class="w-8 h-8 flex items-center justify-center shrink-0"
+                                             :class="m.type === 'Masuk' ? 'bg-green-100' : m.type === 'Keluar' ? 'bg-red-100' : 'bg-slate-100'">
+                                            <i class="fa-solid text-xs"
+                                               :class="m.type === 'Masuk' ? 'fa-arrow-right text-green-600' : m.type === 'Keluar' ? 'fa-arrow-left text-red-600' : 'fa-cross text-slate-500'"></i>
+                                        </div>
+                                        <div class="text-xs">
+                                            <p class="font-bold" x-text="m.name"></p>
+                                            <p class="text-slate-500" x-text="m.type + ' — ' + m.church"></p>
+                                            <div class="flex gap-2 mt-1">
+                                                <span class="text-[10px] text-slate-400" x-text="m.date"></span>
+                                                <span class="badge" :class="m.approved ? 'badge-success' : 'badge-warning'"
+                                                      x-text="m.approved ? 'Disetujui' : 'Menunggu'"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Absensi Kehadiran -->
+            <!-- Laravel equivalent: @include('operator.absensi') -->
+            <!-- Route: /operator/absensi -->
+            <!-- ============================================ -->
+            <div x-show="page === 'absensi'" x-transition>
+                <!-- Absensi Form -->
+                <div class="card mb-6">
+                    <div class="card-header flex items-center justify-between">
+                        <span><i class="fa-solid fa-clipboard-check mr-2"></i>Pencatatan Kehadiran</span>
+                        <span class="badge badge-info" x-text="'Total: ' + absensiToday.length + ' hadir'"></span>
+                    </div>
+                    <div class="card-body">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                            <div class="form-group mb-0">
+                                <label class="form-label">Jenis Ibadah</label>
+                                <select class="form-select" x-model="absensiType">
+                                    <option>Ibadah Raya Minggu</option>
+                                    <option>Sekolah Minggu</option>
+                                    <option>Ibadah Doa</option>
+                                    <option>Komsel / Pertemuan Sel</option>
+                                    <option>Ibadah Pemuda</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Tanggal</label>
+                                <input type="date" class="form-input" x-model="absensiDate">
+                            </div>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Cari Jemaat</label>
+                                <input type="text" class="form-input" placeholder="Ketik nama..." x-model="absensiSearchName">
+                            </div>
+                        </div>
+
+                        <!-- Quick Attendance List -->
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox"></th>
+                                        <th>Nama Jemaat</th>
+                                        <th>Komsel</th>
+                                        <th>Kehadiran</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="j in jemaatList" :key="j.id">
+                                        <tr>
+                                            <td><input type="checkbox" :checked="isPresent(j.id)" @change="togglePresent(j.id)"></td>
+                                            <td class="font-semibold" x-text="j.name"></td>
+                                            <td><span class="badge badge-info" x-text="j.komsel"></span></td>
+                                            <td>
+                                                <span class="badge" :class="isPresent(j.id) ? 'badge-success' : 'badge-danger'"
+                                                      x-text="isPresent(j.id) ? 'Hadir' : 'Tidak Hadir'"></span>
+                                            </td>
+                                            <td><input type="text" class="form-input text-xs py-1" placeholder="Keterangan..."></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <button class="btn btn-dark"><i class="fa-solid fa-save"></i> Simpan Absensi</button>
+                            <button class="btn btn-outline-dark"><i class="fa-solid fa-file-export"></i> Export</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rekap Kehadiran -->
+                <div class="card">
+                    <div class="card-header">Rekap Kehadiran - 5 Minggu Terakhir</div>
+                    <div class="card-body">
+                        <canvas id="absensiChart" height="150" x-init="$nextTick(() => initBarChart('absensiChart', ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4', 'Minggu 5'], [750, 820, 790, 856, 910], 'Kehadiran'))"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Pelayanan -->
+            <!-- Laravel equivalent: @include('operator.pelayanan') -->
+            <!-- Route: /operator/pelayanan -->
+            <!-- ============================================ -->
+            <div x-show="page === 'pelayanan'" x-transition>
+                <!-- Tabs: Aktivis & Jadwal -->
+                <div class="flex gap-2 mb-6">
+                    <button class="btn btn-sm" :class="pelayananTab === 'aktivis' ? 'btn-dark' : 'btn-outline-dark'"
+                            @click="pelayananTab = 'aktivis'">Data Aktivis</button>
+                    <button class="btn btn-sm" :class="pelayananTab === 'jadwal' ? 'btn-dark' : 'btn-outline-dark'"
+                            @click="pelayananTab = 'jadwal'">Jadwal Tugas</button>
+                </div>
+
+                <!-- Data Aktivis -->
+                <div x-show="pelayananTab === 'aktivis'">
+                    <div class="card">
+                        <div class="card-header flex items-center justify-between">
+                            <span>Daftar Aktivis / Pelayan Gereja</span>
+                            <button class="btn btn-dark btn-sm" @click="modalAktivis = true">
+                                <i class="fa-solid fa-plus"></i> Tambah Aktivis
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Nama</th>
+                                            <th>Bidang Pelayanan</th>
+                                            <th>Jabatan</th>
+                                            <th>Telepon</th>
+                                            <th>Status</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="(a, i) in aktivis" :key="a.id">
+                                            <tr>
+                                                <td x-text="i + 1"></td>
+                                                <td class="font-semibold" x-text="a.name"></td>
+                                                <td x-text="a.ministry"></td>
+                                                <td><span class="badge badge-info" x-text="a.role"></span></td>
+                                                <td class="text-xs" x-text="a.phone"></td>
+                                                <td><span class="badge badge-success">Aktif</span></td>
+                                                <td>
+                                                    <div class="flex gap-1">
+                                                        <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-pen"></i></button>
+                                                        <button class="btn btn-outline-dark btn-sm text-red-600"><i class="fa-solid fa-trash"></i></button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jadwal Tugas Pelayanan -->
+                <div x-show="pelayananTab === 'jadwal'">
+                    <div class="card">
+                        <div class="card-header flex items-center justify-between">
+                            <span>Jadwal Tugas Pelayan - Minggu Depan</span>
+                            <button class="btn btn-dark btn-sm" @click="modalJadwal = true">
+                                <i class="fa-solid fa-plus"></i> Atur Jadwal
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tanggal</th>
+                                            <th>Ibadah</th>
+                                            <th>Worship Leader</th>
+                                            <th>Singer</th>
+                                            <th>Musik</th>
+                                            <th>Sound/Multimedia</th>
+                                            <th>Usher</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="s in jadwalPelayanan" :key="s.id">
+                                            <tr>
+                                                <td class="text-xs font-semibold" x-text="s.date"></td>
+                                                <td x-text="s.service"></td>
+                                                <td class="text-xs" x-text="s.wl"></td>
+                                                <td class="text-xs" x-text="s.singer"></td>
+                                                <td class="text-xs" x-text="s.music"></td>
+                                                <td class="text-xs" x-text="s.sound"></td>
+                                                <td class="text-xs" x-text="s.usher"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Aktivis -->
+                <template x-if="modalAktivis">
+                    <div class="modal-backdrop" @click.self="modalAktivis = false">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="font-bold text-sm uppercase">Tambah Aktivis Baru</h3>
+                                <button @click="modalAktivis = false"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="form-label">Pilih Jemaat</label>
+                                    <select class="form-select">
+                                        <template x-for="j in jemaatList"><option x-text="j.name"></option></template>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Bidang Pelayanan</label>
+                                    <select class="form-select">
+                                        <option>Worship Team</option><option>Multimedia</option><option>Usher</option><option>Doa</option><option>Anak/SM</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Jabatan</label>
+                                    <input type="text" class="form-input" placeholder="Leader / Anggota">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-dark btn-sm" @click="modalAktivis = false">Batal</button>
+                                <button class="btn btn-dark btn-sm"><i class="fa-solid fa-save"></i> Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Surat Menyurat -->
+            <!-- Laravel equivalent: @include('operator.surat') -->
+            <!-- Route: /operator/surat -->
+            <!-- ============================================ -->
+            <div x-show="page === 'surat'" x-transition>
+                <!-- Tabs: Jenis Surat -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button class="btn btn-sm" :class="suratTab === 'baptis' ? 'btn-dark' : 'btn-outline-dark'"
+                            @click="suratTab = 'baptis'"><i class="fa-solid fa-water mr-1"></i> Surat Baptis</button>
+                    <button class="btn btn-sm" :class="suratTab === 'anak' ? 'btn-dark' : 'btn-outline-dark'"
+                            @click="suratTab = 'anak'"><i class="fa-solid fa-baby mr-1"></i> Penyerahan Anak</button>
+                    <button class="btn btn-sm" :class="suratTab === 'keanggotaan' ? 'btn-dark' : 'btn-outline-dark'"
+                            @click="suratTab = 'keanggotaan'"><i class="fa-solid fa-id-badge mr-1"></i> Keterangan Keanggotaan</button>
+                    <button class="btn btn-sm" :class="suratTab === 'pindah' ? 'btn-dark' : 'btn-outline-dark'"
+                            @click="suratTab = 'pindah'"><i class="fa-solid fa-plane-departure mr-1"></i> Surat Pindah</button>
+                </div>
+
+                <!-- Form Surat -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="card lg:col-span-2">
+                        <div class="card-header">
+                            <span x-text="suratTab === 'baptis' ? 'Surat Baptis' : suratTab === 'anak' ? 'Surat Penyerahan Anak' : suratTab === 'keanggotaan' ? 'Surat Keterangan Keanggotaan' : 'Surat Pindah'"></span>
+                        </div>
+                        <div class="card-body">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="form-group">
+                                    <label class="form-label">Nama Jemaat</label>
+                                    <select class="form-select">
+                                        <option value="">Pilih Jemaat</option>
+                                        <template x-for="j in jemaatList"><option x-text="j.name"></option></template>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">No. Surat</label>
+                                    <input type="text" class="form-input" placeholder="Auto-generate" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Tanggal Surat</label>
+                                    <input type="date" class="form-input">
+                                </div>
+
+                                <!-- Conditional: Baptis -->
+                                <template x-if="suratTab === 'baptis'">
+                                    <div class="form-group">
+                                        <label class="form-label">Tanggal Baptis</label>
+                                        <input type="date" class="form-input">
+                                    </div>
+                                </template>
+
+                                <!-- Conditional: Penyerahan Anak -->
+                                <template x-if="suratTab === 'anak'">
+                                    <div class="form-group">
+                                        <label class="form-label">Nama Anak</label>
+                                        <input type="text" class="form-input">
+                                    </div>
+                                </template>
+
+                                <!-- Conditional: Pindah -->
+                                <template x-if="suratTab === 'pindah'">
+                                    <div class="form-group">
+                                        <label class="form-label">Gereja Tujuan</label>
+                                        <input type="text" class="form-input">
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Keterangan Tambahan</label>
+                                <textarea class="form-textarea" rows="3"></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn btn-dark"><i class="fa-solid fa-save"></i> Simpan & Cetak</button>
+                                <button class="btn btn-outline-dark"><i class="fa-solid fa-eye"></i> Preview</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Riwayat Surat -->
+                    <div class="card">
+                        <div class="card-header">Riwayat Surat Terbit</div>
+                        <div class="card-body">
+                            <div class="space-y-3">
+                                <template x-for="s in suratHistory" :key="s.id">
+                                    <div class="pb-3 border-b border-slate-50 last:border-0">
+                                        <p class="text-xs font-bold" x-text="s.type"></p>
+                                        <p class="text-xs text-slate-500" x-text="s.name + ' — ' + s.no"></p>
+                                        <div class="flex items-center justify-between mt-1">
+                                            <span class="text-[10px] text-slate-400" x-text="s.date"></span>
+                                            <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-print"></i></button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ============================================ -->
+        <!-- Partial: Footer -->
+        <!-- Laravel equivalent: @include('partials.footer') -->
+        <!-- ============================================ -->
+        <template x-if="true">
+            <footer class="bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between text-[10px] text-slate-400 uppercase tracking-widest">
+                <span>&copy; 2026 GBI Apostolic Center Doyo Baru</span>
+                <span>Developed by Nokensoft.com</span>
+            </footer>
+        </template>
+    </div>
+</div>
+
+<script>
+function operatorApp() {
+    return {
+        page: 'dashboard',
+        sidebarOpen: false,
+        modalJemaat: false,
+        modalAktivis: false,
+        modalJadwal: false,
+        jemaatSearch: '',
+        jemaatFilter: '',
+        absensiType: 'Ibadah Raya Minggu',
+        absensiDate: new Date().toISOString().split('T')[0],
+        absensiSearchName: '',
+        absensiToday: [1, 2, 3, 5, 7],
+        pelayananTab: 'aktivis',
+        suratTab: 'baptis',
+
+        get pageTitle() {
+            const titles = {
+                dashboard: 'Dashboard',
+                jemaat: 'Pendaftaran & Data Jemaat',
+                mutasi: 'Mutasi Jemaat',
+                absensi: 'Absensi Kehadiran',
+                pelayanan: 'Administrasi Pelayanan',
+                surat: 'Surat Menyurat'
+            };
+            return titles[this.page] || 'Dashboard';
+        },
+
+        // ---- Data: Recent Activity ----
+        recentActivity: [
+            { id: 1, icon: 'fa-user-plus', title: 'Pendaftaran Jemaat Baru', detail: 'Budi Santoso — Komsel Berkat', time: '2 menit lalu' },
+            { id: 2, icon: 'fa-clipboard-check', title: 'Absensi Ibadah Raya', detail: '856 dari 1240 jemaat hadir', time: '3 jam lalu' },
+            { id: 3, icon: 'fa-exchange-alt', title: 'Mutasi Masuk', detail: 'Kel. Sirait dari GBI Sentani', time: '5 jam lalu' },
+            { id: 4, icon: 'fa-print', title: 'Cetak Surat Baptis', detail: 'No. SB/2026/03/001 — Rina M.', time: 'Kemarin' },
+        ],
+
+        // ---- Data: Jemaat ----
+        jemaatList: [
+            { id: 1, name: 'Budi Santoso', nik: '9171010101010001', gender: 'Laki-laki', dob: '15 Jan 1985', phone: '0812xxxxxxxx', komsel: 'Berkat', status: 'Aktif' },
+            { id: 2, name: 'Sari Wonda', nik: '9171010202020002', gender: 'Perempuan', dob: '22 Mar 1990', phone: '0813xxxxxxxx', komsel: 'Kasih', status: 'Aktif' },
+            { id: 3, name: 'Yohanis Kogoya', nik: '9171010303030003', gender: 'Laki-laki', dob: '08 Jul 1978', phone: '0852xxxxxxxx', komsel: 'Damai', status: 'Aktif' },
+            { id: 4, name: 'Martha Sirait', nik: '9171010404040004', gender: 'Perempuan', dob: '12 Nov 1995', phone: '0821xxxxxxxx', komsel: 'Berkat', status: 'Aktif' },
+            { id: 5, name: 'Daniel Wanimbo', nik: '9171010505050005', gender: 'Laki-laki', dob: '30 May 1982', phone: '0856xxxxxxxx', komsel: 'Kasih', status: 'Pindah' },
+            { id: 6, name: 'Grace Tabuni', nik: '9171010606060006', gender: 'Perempuan', dob: '03 Sep 1988', phone: '0878xxxxxxxx', komsel: 'Damai', status: 'Aktif' },
+            { id: 7, name: 'Petrus Wenda', nik: '9171010707070007', gender: 'Laki-laki', dob: '19 Feb 1975', phone: '0811xxxxxxxx', komsel: 'Berkat', status: 'Aktif' },
+        ],
+
+        get filteredJemaat() {
+            return this.jemaatList.filter(j => {
+                const matchSearch = !this.jemaatSearch || j.name.toLowerCase().includes(this.jemaatSearch.toLowerCase()) || j.nik.includes(this.jemaatSearch);
+                const matchFilter = !this.jemaatFilter || j.status === this.jemaatFilter;
+                return matchSearch && matchFilter;
+            });
+        },
+
+        // ---- Data: Mutasi ----
+        mutasiList: [
+            { id: 1, name: 'Kel. Sirait', type: 'Masuk', church: 'GBI Sentani', date: '06 Mar 2026', approved: false },
+            { id: 2, name: 'Daniel Wanimbo', type: 'Keluar', church: 'GBI Abepura', date: '01 Mar 2026', approved: true },
+            { id: 3, name: 'Mama Yuliana', type: 'Meninggal', church: '-', date: '25 Feb 2026', approved: true },
+        ],
+
+        // ---- Data: Aktivis ----
+        aktivis: [
+            { id: 1, name: 'Samuel K.', ministry: 'Worship Team', role: 'Leader', phone: '0812xxxxxxxx' },
+            { id: 2, name: 'Rina M.', ministry: 'Worship Team', role: 'Singer', phone: '0813xxxxxxxx' },
+            { id: 3, name: 'David P.', ministry: 'Multimedia', role: 'Operator', phone: '0852xxxxxxxx' },
+            { id: 4, name: 'Esther W.', ministry: 'Usher', role: 'Koordinator', phone: '0821xxxxxxxx' },
+            { id: 5, name: 'John T.', ministry: 'Doa', role: 'Anggota', phone: '0856xxxxxxxx' },
+        ],
+
+        // ---- Data: Jadwal Pelayanan ----
+        jadwalPelayanan: [
+            { id: 1, date: '09 Mar 2026', service: 'Ibadah Raya I', wl: 'Samuel K.', singer: 'Rina M., Grace T.', music: 'David P.', sound: 'Budi S.', usher: 'Esther W.' },
+            { id: 2, date: '09 Mar 2026', service: 'Ibadah Raya II', wl: 'Martha S.', singer: 'John T., Sari W.', music: 'Petrus W.', sound: 'David P.', usher: 'Grace T.' },
+            { id: 3, date: '12 Mar 2026', service: 'Ibadah Doa', wl: 'Samuel K.', singer: 'Rina M.', music: '-', sound: 'David P.', usher: '-' },
+        ],
+
+        // ---- Data: Surat History ----
+        suratHistory: [
+            { id: 1, type: 'Surat Baptis', name: 'Rina Mambrasar', no: 'SB/2026/03/001', date: '05 Mar 2026' },
+            { id: 2, type: 'Surat Keanggotaan', name: 'Budi Santoso', no: 'SK/2026/03/002', date: '04 Mar 2026' },
+            { id: 3, type: 'Surat Penyerahan Anak', name: 'Baby Sirait', no: 'SA/2026/02/015', date: '28 Feb 2026' },
+            { id: 4, type: 'Surat Pindah', name: 'Daniel Wanimbo', no: 'SP/2026/02/014', date: '25 Feb 2026' },
+        ],
+
+        // ---- Absensi Methods ----
+        isPresent(id) {
+            return this.absensiToday.includes(id);
+        },
+        togglePresent(id) {
+            if (this.isPresent(id)) {
+                this.absensiToday = this.absensiToday.filter(i => i !== id);
+            } else {
+                this.absensiToday.push(id);
+            }
+        }
+    };
+}
+</script>
+</body>
+</html>
