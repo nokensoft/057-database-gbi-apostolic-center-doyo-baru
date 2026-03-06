@@ -72,6 +72,19 @@
                     <button @click="page = 'program'" :class="page === 'program' ? 'active' : ''">
                         <i class="fa-solid fa-calendar-days w-5 text-center"></i> Program & Jadwal
                     </button>
+                    <button @click="page = 'operator'" :class="page === 'operator' ? 'active' : ''">
+                        <i class="fa-solid fa-user-gear w-5 text-center"></i> Manajemen Operator
+                    </button>
+
+                    <div class="sidebar-section-title">Pelayanan</div>
+                    <button @click="page = 'jadwalIbadah'" :class="page === 'jadwalIbadah' ? 'active' : ''">
+                        <i class="fa-solid fa-church w-5 text-center"></i> Jadwal Ibadah
+                    </button>
+
+                    <div class="sidebar-section-title">Monitoring</div>
+                    <button @click="page = 'userLogs'" :class="page === 'userLogs' ? 'active' : ''">
+                        <i class="fa-solid fa-user-clock w-5 text-center"></i> User Logs
+                    </button>
 
                     <div class="sidebar-section-title">Lainnya</div>
                     <a href="../auth/login.html">
@@ -128,7 +141,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div class="stat-card">
                         <div>
-                            <p class="stat-label">Total Jemaat</p>
+                            <p class="stat-label">Total Anggota</p>
                             <p class="stat-value">1,240</p>
                         </div>
                         <i class="fa-solid fa-users stat-icon"></i>
@@ -173,7 +186,7 @@
 
                     <!-- Growth Stats -->
                     <div class="card">
-                        <div class="card-header">Pertumbuhan Jemaat</div>
+                        <div class="card-header">Pertumbuhan Anggota</div>
                         <div class="card-body">
                             <canvas id="growthChart" height="200"></canvas>
                         </div>
@@ -624,6 +637,409 @@
                 </template>
             </div>
 
+            <!-- ============================================ -->
+            <!-- Page: Jadwal Ibadah -->
+            <!-- Laravel equivalent: @include('manager.jadwal-ibadah') -->
+            <!-- Route: /manager/jadwal-ibadah -->
+            <!-- ============================================ -->
+            <div x-show="page === 'jadwalIbadah'" x-transition>
+                <!-- Weekly Overview Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <template x-for="day in ['Minggu', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']" :key="day">
+                        <template x-if="jadwalIbadah.filter(j => j.day === day).length > 0">
+                            <div class="card">
+                                <div class="card-header flex items-center gap-2">
+                                    <i class="fa-solid fa-calendar-day text-accent"></i>
+                                    <span class="font-bold" x-text="'Hari ' + day"></span>
+                                </div>
+                                <div class="card-body p-0">
+                                    <template x-for="j in jadwalIbadah.filter(i => i.day === day)" :key="j.id">
+                                        <div class="px-4 py-3 border-b border-slate-50 last:border-0">
+                                            <div class="flex items-start justify-between">
+                                                <div>
+                                                    <p class="text-xs font-bold" x-text="j.name"></p>
+                                                    <p class="text-[11px] text-slate-500 mt-0.5">
+                                                        <i class="fa-regular fa-clock mr-1"></i><span x-text="j.time"></span>
+                                                    </p>
+                                                    <p class="text-[11px] text-slate-400">
+                                                        <i class="fa-solid fa-location-dot mr-1"></i><span x-text="j.location"></span>
+                                                    </p>
+                                                    <p class="text-[10px] text-slate-400 mt-0.5">
+                                                        <i class="fa-solid fa-repeat mr-1"></i><span x-text="j.repeat"></span>
+                                                    </p>
+                                                </div>
+                                                <span class="badge text-[10px]" :class="j.category === 'Ibadah Umum' ? 'badge-info' : j.category === 'Pemuda' ? 'badge-success' : j.category === 'Anak' ? 'badge-warning' : 'badge-info'" x-text="j.category"></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+
+                <!-- Jadwal Ibadah Table -->
+                <div class="card">
+                    <div class="card-header flex items-center justify-between">
+                        <span><i class="fa-solid fa-church mr-2"></i>Daftar Jadwal Ibadah</span>
+                        <button class="btn btn-dark btn-sm" @click="editingJadwal = null; modalJadwalIbadah = true">
+                            <i class="fa-solid fa-plus"></i> Tambah Jadwal
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                            <input type="text" class="form-input sm:max-w-xs" placeholder="Cari jadwal ibadah..." x-model="jadwalSearch">
+                            <select class="form-select sm:max-w-[180px]" x-model="jadwalDayFilter">
+                                <option value="">Semua Hari</option>
+                                <option>Minggu</option>
+                                <option>Rabu</option>
+                                <option>Kamis</option>
+                                <option>Jumat</option>
+                                <option>Sabtu</option>
+                            </select>
+                            <select class="form-select sm:max-w-[180px]" x-model="jadwalCategoryFilter">
+                                <option value="">Semua Kategori</option>
+                                <option>Ibadah Umum</option>
+                                <option>Pemuda</option>
+                                <option>Anak</option>
+                                <option>Komsel</option>
+                            </select>
+                            <select class="form-select sm:max-w-[180px]" x-model="jadwalRepeatFilter">
+                                <option value="">Semua Pengulangan</option>
+                                <option>Mingguan</option>
+                                <option>Bulanan</option>
+                                <option>Tahunan</option>
+                                <option>Sekali</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nama Ibadah</th>
+                                        <th>Hari</th>
+                                        <th>Waktu</th>
+                                        <th>Tempat</th>
+                                        <th>Kategori</th>
+                                        <th>Pengulangan</th>
+                                        <th>Keterangan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(j, i) in filteredJadwalIbadah" :key="j.id">
+                                        <tr>
+                                            <td x-text="i + 1"></td>
+                                            <td class="font-semibold" x-text="j.name"></td>
+                                            <td><span class="badge badge-info" x-text="j.day"></span></td>
+                                            <td class="text-xs font-mono" x-text="j.time"></td>
+                                            <td class="text-xs" x-text="j.location"></td>
+                                            <td>
+                                                <span class="badge" :class="j.category === 'Ibadah Umum' ? 'badge-info' : j.category === 'Pemuda' ? 'badge-success' : j.category === 'Anak' ? 'badge-warning' : 'badge-info'" x-text="j.category"></span>
+                                            </td>
+                                            <td>
+                                                <span class="badge" :class="j.repeat === 'Mingguan' ? 'badge-success' : j.repeat === 'Bulanan' ? 'badge-info' : j.repeat === 'Tahunan' ? 'badge-warning' : 'badge-danger'" x-text="j.repeat"></span>
+                                            </td>
+                                            <td class="text-xs text-slate-500" x-text="j.description || '-'"></td>
+                                            <td>
+                                                <div class="flex gap-1">
+                                                    <button class="btn btn-outline-dark btn-sm" @click="editingJadwal = {...j}; modalJadwalIbadah = true">
+                                                        <i class="fa-solid fa-pen"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-dark btn-sm text-red-600" @click="deleteJadwal(j.id)">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Jadwal Ibadah -->
+                <template x-if="modalJadwalIbadah">
+                    <div class="modal-backdrop" @click.self="modalJadwalIbadah = false">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="font-bold text-sm uppercase" x-text="editingJadwal ? 'Edit Jadwal Ibadah' : 'Tambah Jadwal Ibadah'"></h3>
+                                <button @click="modalJadwalIbadah = false"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="form-label">Nama Ibadah</label>
+                                    <input type="text" class="form-input" placeholder="cth: Ibadah Raya Minggu I" :value="editingJadwal ? editingJadwal.name : ''">
+                                </div>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Hari</label>
+                                        <select class="form-select" :value="editingJadwal ? editingJadwal.day : ''">
+                                            <option value="">Pilih Hari</option>
+                                            <option>Minggu</option>
+                                            <option>Senin</option>
+                                            <option>Selasa</option>
+                                            <option>Rabu</option>
+                                            <option>Kamis</option>
+                                            <option>Jumat</option>
+                                            <option>Sabtu</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Kategori</label>
+                                        <select class="form-select" :value="editingJadwal ? editingJadwal.category : ''">
+                                            <option value="">Pilih Kategori</option>
+                                            <option>Ibadah Umum</option>
+                                            <option>Pemuda</option>
+                                            <option>Anak</option>
+                                            <option>Komsel</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Pengulangan</label>
+                                        <select class="form-select" :value="editingJadwal ? editingJadwal.repeat : ''">
+                                            <option value="">Pilih</option>
+                                            <option>Mingguan</option>
+                                            <option>Bulanan</option>
+                                            <option>Tahunan</option>
+                                            <option>Sekali</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Waktu Mulai</label>
+                                        <input type="time" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Waktu Selesai</label>
+                                        <input type="time" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Tempat</label>
+                                    <input type="text" class="form-input" placeholder="cth: Gedung Utama" :value="editingJadwal ? editingJadwal.location : ''">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Keterangan</label>
+                                    <textarea class="form-textarea" rows="2" :value="editingJadwal ? editingJadwal.description : ''"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-dark btn-sm" @click="modalJadwalIbadah = false">Batal</button>
+                                <button class="btn btn-dark btn-sm" @click="modalJadwalIbadah = false"><i class="fa-solid fa-save"></i> Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Manajemen Operator -->
+            <!-- Laravel equivalent: @include('manager.operator') -->
+            <!-- Route: /manager/operator -->
+            <!-- ============================================ -->
+            <div x-show="page === 'operator'" x-transition>
+                <div class="card">
+                    <div class="card-header flex items-center justify-between">
+                        <span><i class="fa-solid fa-user-gear mr-2"></i>Daftar Operator</span>
+                        <button class="btn btn-dark btn-sm" @click="modalOperator = true; editingOperator = null">
+                            <i class="fa-solid fa-plus"></i> Tambah Operator
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                            <input type="text" class="form-input sm:max-w-xs" placeholder="Cari operator..." x-model="operatorSearch">
+                            <select class="form-select sm:max-w-[180px]" x-model="operatorStatusFilter">
+                                <option value="">Semua Status</option>
+                                <option value="Aktif">Aktif</option>
+                                <option value="Nonaktif">Nonaktif</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nama</th>
+                                        <th>Email</th>
+                                        <th>No. HP</th>
+                                        <th>Terakhir Login</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(op, i) in filteredOperators" :key="op.id">
+                                        <tr>
+                                            <td x-text="i + 1"></td>
+                                            <td class="font-semibold" x-text="op.name"></td>
+                                            <td class="text-xs" x-text="op.email"></td>
+                                            <td class="text-xs" x-text="op.phone"></td>
+                                            <td class="text-xs font-mono" x-text="op.lastLogin"></td>
+                                            <td>
+                                                <span class="badge" :class="op.status === 'Aktif' ? 'badge-success' : 'badge-danger'" x-text="op.status"></span>
+                                            </td>
+                                            <td>
+                                                <div class="flex gap-1">
+                                                    <button class="btn btn-outline-dark btn-sm" @click="editingOperator = {...op}; modalOperator = true">
+                                                        <i class="fa-solid fa-pen"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-dark btn-sm text-red-600" @click="deleteOperator(op.id)">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Operator -->
+                <template x-if="modalOperator">
+                    <div class="modal-backdrop" @click.self="modalOperator = false">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="font-bold text-sm uppercase" x-text="editingOperator ? 'Edit Operator' : 'Tambah Operator Baru'"></h3>
+                                <button @click="modalOperator = false"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="form-label">Nama Lengkap</label>
+                                    <input type="text" class="form-input" :value="editingOperator ? editingOperator.name : ''">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-input" :value="editingOperator ? editingOperator.email : ''">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">No. HP</label>
+                                        <input type="text" class="form-input" :value="editingOperator ? editingOperator.phone : ''">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Username</label>
+                                        <input type="text" class="form-input" :value="editingOperator ? editingOperator.username : ''">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" x-text="editingOperator ? 'Password Baru (opsional)' : 'Password'"></label>
+                                        <input type="password" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Role</label>
+                                    <input type="text" class="form-input bg-slate-100" value="Operator" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select">
+                                        <option value="Aktif" :selected="editingOperator && editingOperator.status === 'Aktif'">Aktif</option>
+                                        <option value="Nonaktif" :selected="editingOperator && editingOperator.status === 'Nonaktif'">Nonaktif</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-dark btn-sm" @click="modalOperator = false">Batal</button>
+                                <button class="btn btn-dark btn-sm" @click="modalOperator = false"><i class="fa-solid fa-save"></i> Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: User Logs -->
+            <!-- Laravel equivalent: @include('manager.user-logs') -->
+            <!-- Route: /manager/user-logs -->
+            <!-- ============================================ -->
+            <div x-show="page === 'userLogs'" x-transition>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Operator Aktif Hari Ini</p>
+                            <p class="stat-value">3</p>
+                        </div>
+                        <i class="fa-solid fa-user-check stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Total Login Hari Ini</p>
+                            <p class="stat-value">8</p>
+                        </div>
+                        <i class="fa-solid fa-right-to-bracket stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Login Gagal</p>
+                            <p class="stat-value text-red-600">1</p>
+                        </div>
+                        <i class="fa-solid fa-ban stat-icon"></i>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header flex items-center justify-between">
+                        <span><i class="fa-solid fa-user-clock mr-2"></i>Riwayat Aktivitas Operator</span>
+                        <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-file-export"></i> Export</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
+                            <input type="text" class="form-input sm:max-w-xs" placeholder="Cari operator..." x-model="userLogSearch">
+                            <select class="form-select sm:max-w-[180px]" x-model="userLogFilter">
+                                <option value="">Semua Aktivitas</option>
+                                <option value="login">Login</option>
+                                <option value="logout">Logout</option>
+                                <option value="failed">Login Gagal</option>
+                            </select>
+                            <input type="date" class="form-input sm:max-w-[180px]">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Pengguna</th>
+                                        <th>Aktivitas</th>
+                                        <th>Waktu</th>
+                                        <th>IP Address</th>
+                                        <th>Browser</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(log, i) in filteredUserLogs" :key="log.id">
+                                        <tr>
+                                            <td x-text="i + 1"></td>
+                                            <td class="font-semibold" x-text="log.user"></td>
+                                            <td x-text="log.action"></td>
+                                            <td class="text-xs font-mono" x-text="log.time"></td>
+                                            <td class="font-mono text-xs" x-text="log.ip"></td>
+                                            <td class="text-xs" x-text="log.browser"></td>
+                                            <td>
+                                                <span class="badge" :class="log.status === 'Berhasil' ? 'badge-success' : 'badge-danger'" x-text="log.status"></span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination mt-4">
+                            <a href="#">&laquo;</a>
+                            <span class="active">1</span>
+                            <a href="#">2</a>
+                            <a href="#">&raquo;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
         <!-- ============================================ -->
@@ -648,7 +1064,19 @@ function managerApp() {
         approvalTab: 'pending',
         modalInventaris: false,
         modalProgram: false,
+        modalOperator: false,
+        modalJadwalIbadah: false,
+        editingOperator: null,
+        editingJadwal: null,
         inventarisSearch: '',
+        operatorSearch: '',
+        operatorStatusFilter: '',
+        jadwalSearch: '',
+        jadwalDayFilter: '',
+        jadwalCategoryFilter: '',
+        jadwalRepeatFilter: '',
+        userLogSearch: '',
+        userLogFilter: '',
 
         get pageTitle() {
             const titles = {
@@ -656,7 +1084,10 @@ function managerApp() {
                 keuangan: 'Laporan Keuangan',
                 inventaris: 'Inventaris Aset',
                 approval: 'Approval / Penyetujuan',
-                program: 'Program & Jadwal'
+                program: 'Program & Jadwal',
+                jadwalIbadah: 'Jadwal Ibadah',
+                operator: 'Manajemen Operator',
+                userLogs: 'User Logs'
             };
             return titles[this.page] || 'Dashboard';
         },
@@ -676,13 +1107,13 @@ function managerApp() {
         ],
 
         approvalsPending: [
-            { id: 1, title: 'Mutasi Jemaat: Keluarga Sirait', description: 'Pindah dari GBI Sentani ke GBI Doyo Baru', by: 'Operator Maria', date: '06 Mar 2026', icon: 'fa-exchange-alt' },
+            { id: 1, title: 'Mutasi Anggota: Keluarga Sirait', description: 'Pindah dari GBI Sentani ke GBI Doyo Baru', by: 'Operator Maria', date: '06 Mar 2026', icon: 'fa-exchange-alt' },
             { id: 2, title: 'Pengajuan Dana Retreat', description: 'Dana retreat pemuda tanggal 15-17 Maret 2026, estimasi Rp 25.000.000', by: 'Operator Budi', date: '05 Mar 2026', icon: 'fa-money-bill' },
-            { id: 3, title: 'Perubahan Data Jemaat #234', description: 'Update status pernikahan: Belum Menikah → Menikah', by: 'Operator Maria', date: '05 Mar 2026', icon: 'fa-user-edit' },
+            { id: 3, title: 'Perubahan Data Anggota #234', description: 'Update status pernikahan: Belum Menikah → Menikah', by: 'Operator Maria', date: '05 Mar 2026', icon: 'fa-user-edit' },
         ],
 
         approvalsHistory: [
-            { id: 10, title: 'Pendaftaran Jemaat Baru: Kel. Wonda', by: 'Operator Budi', date: '04 Mar 2026', status: 'approved' },
+            { id: 10, title: 'Pendaftaran Anggota Baru: Kel. Wonda', by: 'Operator Budi', date: '04 Mar 2026', status: 'approved' },
             { id: 11, title: 'Pengajuan Sound System Baru', by: 'Operator Maria', date: '03 Mar 2026', status: 'approved' },
             { id: 12, title: 'Perubahan jadwal ibadah sementara', by: 'Operator Budi', date: '01 Mar 2026', status: 'rejected' },
         ],
@@ -710,7 +1141,80 @@ function managerApp() {
             { id: 4, day: '29', month: 'Mar', title: 'Rapat Majelis Gereja', time: '18:00 - 21:00', location: 'Ruang Rapat Lt. 2', description: 'Evaluasi program Q1 2026 dan perencanaan Q2', pic: 'Pdt. Yohanes', participants: 15, status: 'Mendatang', statusType: 'info' },
         ],
 
+        // ---- Data: Jadwal Ibadah ----
+        jadwalIbadah: [
+            { id: 1, name: 'Ibadah Raya Minggu I', day: 'Minggu', time: '07:00 - 09:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Mingguan', description: 'Ibadah pagi sesi pertama' },
+            { id: 2, name: 'Ibadah Raya Minggu II', day: 'Minggu', time: '09:30 - 11:30', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Mingguan', description: 'Ibadah pagi sesi kedua' },
+            { id: 3, name: 'Sekolah Minggu', day: 'Minggu', time: '07:00 - 09:00', location: 'Ruang SM', category: 'Anak', repeat: 'Mingguan', description: 'Kelas anak usia 3-12 tahun' },
+            { id: 4, name: 'Ibadah Doa', day: 'Rabu', time: '18:00 - 20:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Mingguan', description: 'Ibadah doa bersama' },
+            { id: 5, name: 'Ibadah Kaum Wanita', day: 'Kamis', time: '10:00 - 12:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Mingguan', description: 'Persekutuan kaum wanita' },
+            { id: 6, name: 'Ibadah Pemuda', day: 'Sabtu', time: '17:00 - 19:00', location: 'Gedung Utama', category: 'Pemuda', repeat: 'Mingguan', description: 'Ibadah dan fellowship pemuda' },
+            { id: 7, name: 'Latihan Paduan Suara', day: 'Jumat', time: '18:00 - 20:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Mingguan', description: 'Latihan PS untuk ibadah Minggu' },
+            { id: 8, name: 'Komsel / Pertemuan Sel', day: 'Rabu', time: '19:00 - 21:00', location: 'Rumah Anggota', category: 'Komsel', repeat: 'Mingguan', description: 'Pertemuan kelompok sel mingguan' },
+            { id: 9, name: 'Perjamuan Kudus', day: 'Minggu', time: '07:00 - 09:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Bulanan', description: 'Ibadah perjamuan kudus setiap minggu pertama' },
+            { id: 10, name: 'Ibadah Perayaan Paskah', day: 'Minggu', time: '07:00 - 12:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Tahunan', description: 'Ibadah perayaan kebangkitan Kristus' },
+            { id: 11, name: 'KKR Kebangunan Rohani', day: 'Sabtu', time: '17:00 - 21:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Sekali', description: 'KKR dengan pembicara Pdt. David — 15 Mar 2026' },
+        ],
+
+        get filteredJadwalIbadah() {
+            return this.jadwalIbadah.filter(j => {
+                const matchSearch = !this.jadwalSearch || j.name.toLowerCase().includes(this.jadwalSearch.toLowerCase());
+                const matchDay = !this.jadwalDayFilter || j.day === this.jadwalDayFilter;
+                const matchCategory = !this.jadwalCategoryFilter || j.category === this.jadwalCategoryFilter;
+                const matchRepeat = !this.jadwalRepeatFilter || j.repeat === this.jadwalRepeatFilter;
+                return matchSearch && matchDay && matchCategory && matchRepeat;
+            });
+        },
+
+        // ---- Data: Operators ----
+        operators: [
+            { id: 1, name: 'Maria S.', email: 'maria@gbidoyo.com', phone: '0812-3456-7890', username: 'maria.op', lastLogin: '06 Mar 2026, 08:30', status: 'Aktif' },
+            { id: 2, name: 'Budi K.', email: 'budi@gbidoyo.com', phone: '0813-5678-1234', username: 'budi.op', lastLogin: '06 Mar 2026, 08:15', status: 'Aktif' },
+            { id: 3, name: 'Sarah P.', email: 'sarah@gbidoyo.com', phone: '0811-2233-4455', username: 'sarah.op', lastLogin: '04 Mar 2026, 09:00', status: 'Aktif' },
+            { id: 4, name: 'Dani W.', email: 'dani@gbidoyo.com', phone: '0822-9988-7766', username: 'dani.op', lastLogin: '28 Feb 2026, 10:00', status: 'Nonaktif' },
+        ],
+
+        get filteredOperators() {
+            return this.operators.filter(op => {
+                const matchSearch = !this.operatorSearch || op.name.toLowerCase().includes(this.operatorSearch.toLowerCase()) || op.email.toLowerCase().includes(this.operatorSearch.toLowerCase());
+                const matchStatus = !this.operatorStatusFilter || op.status === this.operatorStatusFilter;
+                return matchSearch && matchStatus;
+            });
+        },
+
+        // ---- Data: User Logs ----
+        userLogs: [
+            { id: 1, user: 'Maria S.', action: 'Login', time: '06 Mar 2026, 08:30', ip: '192.168.1.15', browser: 'Chrome 122', status: 'Berhasil', type: 'login' },
+            { id: 2, user: 'Budi K.', action: 'Login', time: '06 Mar 2026, 08:15', ip: '192.168.1.18', browser: 'Edge 122', status: 'Berhasil', type: 'login' },
+            { id: 3, user: 'Sarah P.', action: 'Login', time: '06 Mar 2026, 09:10', ip: '192.168.1.22', browser: 'Chrome 122', status: 'Berhasil', type: 'login' },
+            { id: 4, user: 'Maria S.', action: 'Logout', time: '05 Mar 2026, 17:00', ip: '192.168.1.15', browser: 'Chrome 122', status: 'Berhasil', type: 'logout' },
+            { id: 5, user: 'Budi K.', action: 'Logout', time: '05 Mar 2026, 17:15', ip: '192.168.1.18', browser: 'Edge 122', status: 'Berhasil', type: 'logout' },
+            { id: 6, user: 'Dani W.', action: 'Login Gagal', time: '05 Mar 2026, 14:00', ip: '192.168.1.30', browser: 'Firefox 124', status: 'Gagal', type: 'failed' },
+            { id: 7, user: 'Sarah P.', action: 'Logout', time: '04 Mar 2026, 16:45', ip: '192.168.1.22', browser: 'Chrome 122', status: 'Berhasil', type: 'logout' },
+            { id: 8, user: 'Maria S.', action: 'Login', time: '04 Mar 2026, 08:00', ip: '192.168.1.15', browser: 'Chrome 122', status: 'Berhasil', type: 'login' },
+        ],
+
+        get filteredUserLogs() {
+            return this.userLogs.filter(l => {
+                const matchSearch = !this.userLogSearch || l.user.toLowerCase().includes(this.userLogSearch.toLowerCase());
+                const matchFilter = !this.userLogFilter || l.type === this.userLogFilter;
+                return matchSearch && matchFilter;
+            });
+        },
+
         // ---- Methods ----
+        deleteOperator(id) {
+            if (confirm('Yakin ingin menghapus operator ini?')) {
+                this.operators = this.operators.filter(op => op.id !== id);
+            }
+        },
+
+        deleteJadwal(id) {
+            if (confirm('Yakin ingin menghapus jadwal ibadah ini?')) {
+                this.jadwalIbadah = this.jadwalIbadah.filter(j => j.id !== id);
+            }
+        },
+
         approveItem(id) {
             this.approvalsPending = this.approvalsPending.filter(a => a.id !== id);
         },

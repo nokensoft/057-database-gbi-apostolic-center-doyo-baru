@@ -80,6 +80,9 @@
                     <button @click="page = 'log'" :class="page === 'log' ? 'active' : ''">
                         <i class="fa-solid fa-clipboard-list w-5 text-center"></i> Log Audit
                     </button>
+                    <button @click="page = 'userLogs'" :class="page === 'userLogs' ? 'active' : ''">
+                        <i class="fa-solid fa-user-clock w-5 text-center"></i> User Logs
+                    </button>
 
                     <div class="sidebar-section-title">Lainnya</div>
 
@@ -431,7 +434,6 @@
                                     <label class="form-label">Role</label>
                                     <select class="form-select">
                                         <option value="">Pilih Role</option>
-                                        <option value="admin-master">Admin Master</option>
                                         <option value="manager">Manager</option>
                                         <option value="operator">Operator</option>
                                     </select>
@@ -720,6 +722,108 @@
                 </div>
             </div>
 
+            <!-- ============================================ -->
+            <!-- Page: User Logs -->
+            <!-- Laravel equivalent: @include('admin-master.user-logs') -->
+            <!-- Route: /admin-master/user-logs -->
+            <!-- ============================================ -->
+            <div x-show="page === 'userLogs'" x-transition>
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">User Aktif Hari Ini</p>
+                            <p class="stat-value">4</p>
+                        </div>
+                        <i class="fa-solid fa-user-check stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Total Login Hari Ini</p>
+                            <p class="stat-value">12</p>
+                        </div>
+                        <i class="fa-solid fa-right-to-bracket stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Login Gagal</p>
+                            <p class="stat-value text-red-600">3</p>
+                        </div>
+                        <i class="fa-solid fa-ban stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Session Aktif</p>
+                            <p class="stat-value">2</p>
+                        </div>
+                        <i class="fa-solid fa-tower-broadcast stat-icon"></i>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header flex items-center justify-between">
+                        <span><i class="fa-solid fa-user-clock mr-2"></i>Riwayat Aktivitas Pengguna</span>
+                        <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-file-export"></i> Export</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
+                            <input type="text" class="form-input sm:max-w-xs" placeholder="Cari pengguna..." x-model="userLogSearch">
+                            <select class="form-select sm:max-w-[180px]" x-model="userLogFilter">
+                                <option value="">Semua Aktivitas</option>
+                                <option value="login">Login</option>
+                                <option value="logout">Logout</option>
+                                <option value="failed">Login Gagal</option>
+                            </select>
+                            <select class="form-select sm:max-w-[180px]" x-model="userLogRole">
+                                <option value="">Semua Role</option>
+                                <option value="admin-master">Admin Master</option>
+                                <option value="manager">Manager</option>
+                                <option value="operator">Operator</option>
+                            </select>
+                            <input type="date" class="form-input sm:max-w-[180px]">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Pengguna</th>
+                                        <th>Role</th>
+                                        <th>Aktivitas</th>
+                                        <th>Waktu</th>
+                                        <th>IP Address</th>
+                                        <th>Browser</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(log, i) in filteredUserLogs" :key="log.id">
+                                        <tr>
+                                            <td x-text="i + 1"></td>
+                                            <td class="font-semibold" x-text="log.user"></td>
+                                            <td><span class="badge badge-info" x-text="log.role"></span></td>
+                                            <td x-text="log.action"></td>
+                                            <td class="text-xs font-mono" x-text="log.time"></td>
+                                            <td class="font-mono text-xs" x-text="log.ip"></td>
+                                            <td class="text-xs" x-text="log.browser"></td>
+                                            <td>
+                                                <span class="badge" :class="log.status === 'Berhasil' ? 'badge-success' : 'badge-danger'" x-text="log.status"></span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination mt-4">
+                            <a href="#">&laquo;</a>
+                            <span class="active">1</span>
+                            <a href="#">2</a>
+                            <a href="#">3</a>
+                            <a href="#">&raquo;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
         <!-- ============================================ -->
@@ -752,6 +856,10 @@ function adminMasterApp() {
         logFilterDate: '',
         logFilterUser: '',
 
+        userLogSearch: '',
+        userLogFilter: '',
+        userLogRole: '',
+
         get pageTitle() {
             const titles = {
                 dashboard: 'Dashboard',
@@ -759,7 +867,8 @@ function adminMasterApp() {
                 pengguna: 'Manajemen Pengguna',
                 keamanan: 'Keamanan & Hak Akses',
                 backup: 'Backup & Recovery',
-                log: 'Log Audit'
+                log: 'Log Audit',
+                userLogs: 'User Logs'
             };
             return titles[this.page] || 'Dashboard';
         },
@@ -776,7 +885,7 @@ function adminMasterApp() {
         // ---- Data: Recent Logs ----
         recentLogs: [
             { id: 1, time: '06 Mar 2026, 14:22', user: 'Admin Master', action: 'Login berhasil', ip: '192.168.1.10', status: 'Sukses', statusType: 'success' },
-            { id: 2, time: '06 Mar 2026, 13:50', user: 'Operator 1', action: 'Tambah data jemaat baru', ip: '192.168.1.15', status: 'Sukses', statusType: 'success' },
+            { id: 2, time: '06 Mar 2026, 13:50', user: 'Operator 1', action: 'Tambah data anggota baru', ip: '192.168.1.15', status: 'Sukses', statusType: 'success' },
             { id: 3, time: '06 Mar 2026, 12:30', user: 'Manager A', action: 'Export laporan keuangan', ip: '192.168.1.20', status: 'Sukses', statusType: 'success' },
             { id: 4, time: '06 Mar 2026, 10:15', user: 'System', action: 'Auto backup database', ip: 'localhost', status: 'Sukses', statusType: 'success' },
             { id: 5, time: '05 Mar 2026, 23:00', user: 'Unknown', action: 'Login gagal (3x)', ip: '103.45.67.89', status: 'Gagal', statusType: 'danger' },
@@ -808,7 +917,7 @@ function adminMasterApp() {
             { module: 'Dashboard Laporan', admin: true, manager: true, operator: false },
             { module: 'Keuangan & Inventaris', admin: true, manager: true, operator: false },
             { module: 'Approval Data', admin: true, manager: true, operator: false },
-            { module: 'Data Jemaat (CRUD)', admin: true, manager: true, operator: true },
+            { module: 'Data Anggota (CRUD)', admin: true, manager: true, operator: true },
             { module: 'Absensi / Kehadiran', admin: true, manager: true, operator: true },
             { module: 'Pelayanan', admin: true, manager: true, operator: true },
             { module: 'Surat Menyurat', admin: true, manager: false, operator: true },
@@ -825,13 +934,36 @@ function adminMasterApp() {
         // ---- Data: Audit Logs ----
         auditLogs: [
             { id: 1, timestamp: '2026-03-06 14:22:15', user: 'Admin Master', type: 'auth', action: 'Login berhasil', ip: '192.168.1.10', status: 'Sukses', statusType: 'success' },
-            { id: 2, timestamp: '2026-03-06 13:50:30', user: 'Operator 1', type: 'crud', action: 'INSERT jemaat: Budi Santoso', ip: '192.168.1.15', status: 'Sukses', statusType: 'success' },
+            { id: 2, timestamp: '2026-03-06 13:50:30', user: 'Operator 1', type: 'crud', action: 'INSERT anggota: Budi Santoso', ip: '192.168.1.15', status: 'Sukses', statusType: 'success' },
             { id: 3, timestamp: '2026-03-06 12:30:00', user: 'Manager A', type: 'system', action: 'Export laporan keuangan Q1', ip: '192.168.1.20', status: 'Sukses', statusType: 'success' },
             { id: 4, timestamp: '2026-03-06 10:15:00', user: 'System', type: 'backup', action: 'Auto backup database completed', ip: '127.0.0.1', status: 'Sukses', statusType: 'success' },
             { id: 5, timestamp: '2026-03-05 23:00:45', user: 'Unknown', type: 'auth', action: 'Login gagal - brute force detected', ip: '103.45.67.89', status: 'Gagal', statusType: 'danger' },
-            { id: 6, timestamp: '2026-03-05 18:20:10', user: 'Operator 1', type: 'crud', action: 'UPDATE jemaat: mutasi keluarga #45', ip: '192.168.1.15', status: 'Sukses', statusType: 'success' },
+            { id: 6, timestamp: '2026-03-05 18:20:10', user: 'Operator 1', type: 'crud', action: 'UPDATE anggota: mutasi keluarga #45', ip: '192.168.1.15', status: 'Sukses', statusType: 'success' },
             { id: 7, timestamp: '2026-03-05 15:10:00', user: 'Admin Master', type: 'system', action: 'Ubah konfigurasi session timeout', ip: '192.168.1.10', status: 'Sukses', statusType: 'success' },
         ],
+
+        // ---- Data: User Logs ----
+        userLogs: [
+            { id: 1, user: 'Super Admin', role: 'admin-master', action: 'Login', time: '06 Mar 2026, 14:22', ip: '192.168.1.10', browser: 'Chrome 122', status: 'Berhasil', type: 'login' },
+            { id: 2, user: 'Pdt. Yohanes', role: 'manager', action: 'Login', time: '06 Mar 2026, 09:00', ip: '192.168.1.20', browser: 'Firefox 124', status: 'Berhasil', type: 'login' },
+            { id: 3, user: 'Maria S.', role: 'operator', action: 'Login', time: '06 Mar 2026, 08:30', ip: '192.168.1.15', browser: 'Chrome 122', status: 'Berhasil', type: 'login' },
+            { id: 4, user: 'Budi K.', role: 'operator', action: 'Login', time: '06 Mar 2026, 08:15', ip: '192.168.1.18', browser: 'Edge 122', status: 'Berhasil', type: 'login' },
+            { id: 5, user: 'Unknown', role: '-', action: 'Login Gagal (3x)', time: '05 Mar 2026, 23:00', ip: '103.45.67.89', browser: 'Chrome 121', status: 'Gagal', type: 'failed' },
+            { id: 6, user: 'Maria S.', role: 'operator', action: 'Logout', time: '05 Mar 2026, 17:00', ip: '192.168.1.15', browser: 'Chrome 122', status: 'Berhasil', type: 'logout' },
+            { id: 7, user: 'Pdt. Yohanes', role: 'manager', action: 'Logout', time: '05 Mar 2026, 16:30', ip: '192.168.1.20', browser: 'Firefox 124', status: 'Berhasil', type: 'logout' },
+            { id: 8, user: 'Super Admin', role: 'admin-master', action: 'Login', time: '05 Mar 2026, 14:00', ip: '192.168.1.10', browser: 'Chrome 122', status: 'Berhasil', type: 'login' },
+            { id: 9, user: 'Sarah P.', role: 'operator', action: 'Login Gagal', time: '05 Mar 2026, 10:00', ip: '192.168.1.22', browser: 'Safari 17', status: 'Gagal', type: 'failed' },
+            { id: 10, user: 'Budi K.', role: 'operator', action: 'Logout', time: '04 Mar 2026, 17:15', ip: '192.168.1.18', browser: 'Edge 122', status: 'Berhasil', type: 'logout' },
+        ],
+
+        get filteredUserLogs() {
+            return this.userLogs.filter(l => {
+                const matchSearch = !this.userLogSearch || l.user.toLowerCase().includes(this.userLogSearch.toLowerCase());
+                const matchFilter = !this.userLogFilter || l.type === this.userLogFilter;
+                const matchRole = !this.userLogRole || l.role === this.userLogRole;
+                return matchSearch && matchFilter && matchRole;
+            });
+        },
 
         // ---- Methods ----
         createBackup(type) {

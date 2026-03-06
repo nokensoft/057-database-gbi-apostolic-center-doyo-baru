@@ -57,16 +57,24 @@
                     </button>
 
                     <div class="sidebar-section-title">Data Jemaat</div>
+                    <button @click="page = 'keluarga'" :class="page === 'keluarga' ? 'active' : ''">
+                        <i class="fa-solid fa-house-chimney-user w-5 text-center"></i> Kartu Keluarga
+                    </button>
                     <button @click="page = 'jemaat'" :class="page === 'jemaat' ? 'active' : ''">
-                        <i class="fa-solid fa-id-card w-5 text-center"></i> Pendaftaran & Data
+                        <i class="fa-solid fa-id-card w-5 text-center"></i> Data Anggota
                     </button>
                     <button @click="page = 'mutasi'" :class="page === 'mutasi' ? 'active' : ''">
-                        <i class="fa-solid fa-exchange-alt w-5 text-center"></i> Mutasi Jemaat
+                        <i class="fa-solid fa-exchange-alt w-5 text-center"></i> Mutasi Anggota
+                    </button>
+
+                    <div class="sidebar-section-title">Kelompok & Komsel</div>
+                    <button @click="page = 'komsel'" :class="page === 'komsel' ? 'active' : ''">
+                        <i class="fa-solid fa-people-group w-5 text-center"></i> Manajemen Komsel
                     </button>
 
                     <div class="sidebar-section-title">Kegiatan</div>
-                    <button @click="page = 'absensi'" :class="page === 'absensi' ? 'active' : ''">
-                        <i class="fa-solid fa-clipboard-check w-5 text-center"></i> Absensi Kehadiran
+                    <button @click="page = 'kehadiran'" :class="page === 'kehadiran' ? 'active' : ''">
+                        <i class="fa-solid fa-clipboard-check w-5 text-center"></i> Kehadiran Jemaat
                     </button>
                     <button @click="page = 'pelayanan'" :class="page === 'pelayanan' ? 'active' : ''">
                         <i class="fa-solid fa-hand-holding-heart w-5 text-center"></i> Pelayanan
@@ -129,14 +137,14 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div class="stat-card">
                         <div>
-                            <p class="stat-label">Total Jemaat</p>
+                            <p class="stat-label">Total Anggota</p>
                             <p class="stat-value">1,240</p>
                         </div>
                         <i class="fa-solid fa-users stat-icon"></i>
                     </div>
                     <div class="stat-card">
                         <div>
-                            <p class="stat-label">Jemaat Baru (Bulan Ini)</p>
+                            <p class="stat-label">Anggota Baru (Bulan Ini)</p>
                             <p class="stat-value text-green-600">18</p>
                         </div>
                         <i class="fa-solid fa-user-plus stat-icon"></i>
@@ -163,12 +171,12 @@
                     <button @click="page = 'jemaat'; modalJemaat = true"
                             class="flex items-center justify-center gap-3 p-5 border-2 border-dashed border-slate-200 hover:border-accent hover:text-accent transition group card">
                         <i class="fa-solid fa-id-card text-xl text-slate-300 group-hover:text-accent"></i>
-                        <span class="font-bold uppercase text-sm">Input Jemaat Baru</span>
+                        <span class="font-bold uppercase text-sm">Input Anggota Baru</span>
                     </button>
-                    <button @click="page = 'absensi'"
+                    <button @click="page = 'kehadiran'"
                             class="flex items-center justify-center gap-3 p-5 border-2 border-dashed border-slate-200 hover:border-accent hover:text-accent transition group card">
                         <i class="fa-solid fa-clipboard-check text-xl text-slate-300 group-hover:text-accent"></i>
-                        <span class="font-bold uppercase text-sm">Absensi Ibadah</span>
+                        <span class="font-bold uppercase text-sm">Kehadiran Jemaat</span>
                     </button>
                     <button @click="page = 'surat'"
                             class="flex items-center justify-center gap-3 p-5 border-2 border-dashed border-slate-200 hover:border-accent hover:text-accent transition group card">
@@ -200,23 +208,23 @@
             </div>
 
             <!-- ============================================ -->
-            <!-- Page: Pendaftaran & Data Jemaat -->
+            <!-- Page: Pendaftaran & Data Anggota -->
             <!-- Laravel equivalent: @include('operator.jemaat') -->
             <!-- Route: /operator/jemaat -->
             <!-- ============================================ -->
             <div x-show="page === 'jemaat'" x-transition>
                 <div class="card">
                     <div class="card-header flex items-center justify-between">
-                        <span><i class="fa-solid fa-id-card mr-2"></i>Data Jemaat</span>
+                        <span><i class="fa-solid fa-id-card mr-2"></i>Data Anggota</span>
                         <div class="flex gap-2">
                             <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-file-excel"></i> Export</button>
                             <button class="btn btn-dark btn-sm" @click="modalJemaat = true">
-                                <i class="fa-solid fa-plus"></i> Tambah Jemaat
+                                <i class="fa-solid fa-plus"></i> Tambah Anggota
                             </button>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                        <div class="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
                             <input type="text" class="form-input sm:max-w-xs" placeholder="Cari nama/NIK..."
                                    x-model="jemaatSearch">
                             <select class="form-select sm:max-w-[180px]" x-model="jemaatFilter">
@@ -225,11 +233,17 @@
                                 <option value="Pindah">Pindah</option>
                                 <option value="Meninggal">Meninggal</option>
                             </select>
-                            <select class="form-select sm:max-w-[180px]">
+                            <select class="form-select sm:max-w-[180px]" x-model="jemaatKelompokFilter">
+                                <option value="">Semua Kelompok</option>
+                                <option value="Sekolah Minggu">Sekolah Minggu</option>
+                                <option value="Pemuda">Pemuda</option>
+                                <option value="Dewasa">Dewasa</option>
+                            </select>
+                            <select class="form-select sm:max-w-[180px]" x-model="jemaatKomselFilter">
                                 <option value="">Semua Komsel</option>
-                                <option>Komsel Berkat</option>
-                                <option>Komsel Kasih</option>
-                                <option>Komsel Damai</option>
+                                <template x-for="k in komselList" :key="k.id">
+                                    <option :value="k.name" x-text="k.name"></option>
+                                </template>
                             </select>
                         </div>
                         <div class="overflow-x-auto">
@@ -239,10 +253,11 @@
                                         <th>#</th>
                                         <th>Nama Lengkap</th>
                                         <th>NIK</th>
-                                        <th>Jenis Kelamin</th>
-                                        <th>Tgl Lahir</th>
-                                        <th>Telepon</th>
+                                        <th>Keluarga</th>
+                                        <th>Kelompok</th>
                                         <th>Komsel</th>
+                                        <th>JK</th>
+                                        <th>Telepon</th>
                                         <th>Status</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -253,10 +268,14 @@
                                             <td x-text="i + 1"></td>
                                             <td class="font-semibold" x-text="j.name"></td>
                                             <td class="font-mono text-xs" x-text="j.nik"></td>
-                                            <td x-text="j.gender"></td>
-                                            <td class="text-xs" x-text="j.dob"></td>
+                                            <td class="text-xs" x-text="getKeluargaName(j.keluargaId)"></td>
+                                            <td>
+                                                <span class="badge" :class="j.kelompok === 'Dewasa' ? 'badge-info' : j.kelompok === 'Pemuda' ? 'badge-success' : 'badge-warning'"
+                                                      x-text="j.kelompok"></span>
+                                            </td>
+                                            <td class="text-xs" x-text="j.komsel"></td>
+                                            <td class="text-xs" x-text="j.gender === 'Laki-laki' ? 'L' : 'P'"></td>
                                             <td class="text-xs" x-text="j.phone"></td>
-                                            <td><span class="badge badge-info" x-text="j.komsel"></span></td>
                                             <td>
                                                 <span class="badge" :class="j.status === 'Aktif' ? 'badge-success' : j.status === 'Pindah' ? 'badge-warning' : 'badge-danger'"
                                                       x-text="j.status"></span>
@@ -283,12 +302,12 @@
                     </div>
                 </div>
 
-                <!-- Modal: Tambah Jemaat -->
+                <!-- Modal: Tambah Anggota -->
                 <template x-if="modalJemaat">
                     <div class="modal-backdrop" @click.self="modalJemaat = false">
                         <div class="modal-content" style="max-width: 700px;">
                             <div class="modal-header">
-                                <h3 class="font-bold text-sm uppercase">Pendaftaran Jemaat Baru</h3>
+                                <h3 class="font-bold text-sm uppercase">Pendaftaran Anggota Baru</h3>
                                 <button @click="modalJemaat = false"><i class="fa-solid fa-xmark"></i></button>
                             </div>
                             <div class="modal-body">
@@ -329,12 +348,41 @@
                                         <input type="text" class="form-input" placeholder="08xxxxxxxxxx">
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Komsel / Kelompok Sel</label>
+                                        <label class="form-label">Keluarga</label>
+                                        <select class="form-select">
+                                            <option value="">Pilih Keluarga</option>
+                                            <template x-for="k in keluargaList" :key="k.id">
+                                                <option :value="k.id" x-text="k.kepala + ' (' + k.noKK + ')'"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Hubungan dalam Keluarga</label>
+                                        <select class="form-select">
+                                            <option value="">Pilih Hubungan</option>
+                                            <option>Kepala Keluarga</option>
+                                            <option>Istri</option>
+                                            <option>Suami</option>
+                                            <option>Anak</option>
+                                            <option>Lainnya</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Kelompok Layanan</label>
+                                        <select class="form-select">
+                                            <option value="">Pilih Kelompok</option>
+                                            <option>Sekolah Minggu</option>
+                                            <option>Pemuda</option>
+                                            <option>Dewasa</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Komsel</label>
                                         <select class="form-select">
                                             <option value="">Pilih Komsel</option>
-                                            <option>Komsel Berkat</option>
-                                            <option>Komsel Kasih</option>
-                                            <option>Komsel Damai</option>
+                                            <template x-for="k in komselList" :key="k.id">
+                                                <option :value="k.id" x-text="k.name"></option>
+                                            </template>
                                         </select>
                                     </div>
                                 </div>
@@ -357,7 +405,182 @@
             </div>
 
             <!-- ============================================ -->
-            <!-- Page: Mutasi Jemaat -->
+            <!-- Page: Kartu Keluarga -->
+            <!-- Laravel equivalent: @include('operator.keluarga') -->
+            <!-- Route: /operator/keluarga -->
+            <!-- ============================================ -->
+            <div x-show="page === 'keluarga'" x-transition>
+                <!-- Stats -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Total Keluarga</p>
+                            <p class="stat-value" x-text="keluargaList.length"></p>
+                        </div>
+                        <i class="fa-solid fa-house-chimney-user stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Anggota Terhubung</p>
+                            <p class="stat-value" x-text="jemaatList.filter(j => j.keluargaId).length"></p>
+                        </div>
+                        <i class="fa-solid fa-users stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="stat-label">Belum Terhubung</p>
+                            <p class="stat-value text-amber-600" x-text="jemaatList.filter(j => !j.keluargaId).length"></p>
+                        </div>
+                        <i class="fa-solid fa-user-xmark stat-icon"></i>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header flex items-center justify-between">
+                        <span><i class="fa-solid fa-house-chimney-user mr-2"></i>Data Kartu Keluarga</span>
+                        <div class="flex gap-2">
+                            <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-file-excel"></i> Export</button>
+                            <button class="btn btn-dark btn-sm" @click="modalKeluarga = true">
+                                <i class="fa-solid fa-plus"></i> Tambah Keluarga
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                            <input type="text" class="form-input sm:max-w-xs" placeholder="Cari No. KK / Kepala Keluarga..." x-model="keluargaSearch">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>No. Kartu Keluarga</th>
+                                        <th>Kepala Keluarga</th>
+                                        <th>Alamat</th>
+                                        <th>Telepon</th>
+                                        <th>Jml. Anggota</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(k, i) in filteredKeluarga" :key="k.id">
+                                        <tr>
+                                            <td x-text="i + 1"></td>
+                                            <td class="font-mono text-xs" x-text="k.noKK"></td>
+                                            <td class="font-semibold" x-text="k.kepala"></td>
+                                            <td class="text-xs" x-text="k.alamat"></td>
+                                            <td class="text-xs" x-text="k.phone"></td>
+                                            <td class="text-center">
+                                                <span class="badge badge-info" x-text="getAnggotaKeluarga(k.id).length + ' orang'"></span>
+                                            </td>
+                                            <td>
+                                                <div class="flex gap-1">
+                                                    <button class="btn btn-outline-dark btn-sm" @click="selectedKeluarga = (selectedKeluarga === k.id ? null : k.id)">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-pen"></i></button>
+                                                    <button class="btn btn-outline-dark btn-sm text-red-600"><i class="fa-solid fa-trash"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Detail Anggota Keluarga -->
+                        <template x-if="selectedKeluarga">
+                            <div class="mt-6 border-t border-slate-200 pt-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-bold text-sm uppercase">
+                                        <i class="fa-solid fa-users mr-1"></i> Anggota Keluarga &mdash;
+                                        <span x-text="keluargaList.find(k => k.id === selectedKeluarga)?.kepala"></span>
+                                    </h3>
+                                    <button class="btn btn-outline-dark btn-sm" @click="selectedKeluarga = null">
+                                        <i class="fa-solid fa-xmark"></i> Tutup
+                                    </button>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Nama</th>
+                                                <th>Hubungan</th>
+                                                <th>Jenis Kelamin</th>
+                                                <th>Tgl Lahir</th>
+                                                <th>Kelompok</th>
+                                                <th>Komsel</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template x-for="(a, i) in getAnggotaKeluarga(selectedKeluarga)" :key="a.id">
+                                                <tr>
+                                                    <td x-text="i + 1"></td>
+                                                    <td class="font-semibold" x-text="a.name"></td>
+                                                    <td x-text="a.hubungan || '-'"></td>
+                                                    <td x-text="a.gender"></td>
+                                                    <td class="text-xs" x-text="a.dob"></td>
+                                                    <td><span class="badge badge-info" x-text="a.kelompok"></span></td>
+                                                    <td class="text-xs" x-text="a.komsel"></td>
+                                                    <td>
+                                                        <span class="badge" :class="a.status === 'Aktif' ? 'badge-success' : 'badge-warning'" x-text="a.status"></span>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Modal: Tambah Keluarga -->
+                <template x-if="modalKeluarga">
+                    <div class="modal-backdrop" @click.self="modalKeluarga = false">
+                        <div class="modal-content" style="max-width: 600px;">
+                            <div class="modal-header">
+                                <h3 class="font-bold text-sm uppercase">Tambah Kartu Keluarga</h3>
+                                <button @click="modalKeluarga = false"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">No. Kartu Keluarga</label>
+                                        <input type="text" class="form-input" placeholder="16 digit No. KK">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Kepala Keluarga</label>
+                                        <select class="form-select">
+                                            <option value="">Pilih dari Data Anggota</option>
+                                            <template x-for="j in jemaatList" :key="j.id">
+                                                <option :value="j.id" x-text="j.name"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">No. Telepon</label>
+                                        <input type="text" class="form-input" placeholder="08xxxxxxxxxx">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Alamat Lengkap</label>
+                                    <textarea class="form-textarea" rows="2" placeholder="Alamat sesuai KK"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-dark btn-sm" @click="modalKeluarga = false">Batal</button>
+                                <button class="btn btn-dark btn-sm"><i class="fa-solid fa-save"></i> Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Mutasi Anggota -->
             <!-- Laravel equivalent: @include('operator.mutasi') -->
             <!-- Route: /operator/mutasi -->
             <!-- ============================================ -->
@@ -365,12 +588,12 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Form Mutasi -->
                     <div class="card">
-                        <div class="card-header"><i class="fa-solid fa-exchange-alt mr-2"></i>Form Mutasi Jemaat</div>
+                        <div class="card-header"><i class="fa-solid fa-exchange-alt mr-2"></i>Form Mutasi Anggota</div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label class="form-label">Nama Jemaat</label>
+                                <label class="form-label">Nama Anggota</label>
                                 <select class="form-select">
-                                    <option value="">Pilih Jemaat</option>
+                                    <option value="">Pilih Anggota</option>
                                     <template x-for="j in jemaatList" :key="j.id">
                                         <option :value="j.id" x-text="j.name"></option>
                                     </template>
@@ -430,19 +653,172 @@
             </div>
 
             <!-- ============================================ -->
-            <!-- Page: Absensi Kehadiran -->
-            <!-- Laravel equivalent: @include('operator.absensi') -->
-            <!-- Route: /operator/absensi -->
+            <!-- Page: Manajemen Komsel -->
+            <!-- Laravel equivalent: @include('operator.komsel') -->
+            <!-- Route: /operator/komsel -->
             <!-- ============================================ -->
-            <div x-show="page === 'absensi'" x-transition>
-                <!-- Absensi Form -->
+            <div x-show="page === 'komsel'" x-transition>
+                <!-- Komsel Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <template x-for="k in komselList" :key="k.id">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <h3 class="font-bold text-sm" x-text="k.name"></h3>
+                                        <p class="text-xs text-slate-500" x-text="'Wilayah: ' + k.area"></p>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-pen"></i></button>
+                                        <button class="btn btn-outline-dark btn-sm text-red-600"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Pemimpin</span>
+                                        <span class="font-semibold" x-text="k.leader"></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Hari Pertemuan</span>
+                                        <span class="font-semibold" x-text="k.meetingDay"></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Jumlah Anggota</span>
+                                        <span class="badge badge-info" x-text="k.memberCount + ' orang'"></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Telepon Pemimpin</span>
+                                        <span x-text="k.phone"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Komsel Table -->
+                <div class="card">
+                    <div class="card-header flex items-center justify-between">
+                        <span><i class="fa-solid fa-people-group mr-2"></i>Daftar Komsel</span>
+                        <div class="flex gap-2">
+                            <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-file-excel"></i> Export</button>
+                            <button class="btn btn-dark btn-sm" @click="modalKomsel = true">
+                                <i class="fa-solid fa-plus"></i> Tambah Komsel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nama Komsel</th>
+                                        <th>Pemimpin</th>
+                                        <th>Wilayah</th>
+                                        <th>Hari Pertemuan</th>
+                                        <th>Anggota</th>
+                                        <th>Telepon</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(k, i) in komselList" :key="k.id">
+                                        <tr>
+                                            <td x-text="i + 1"></td>
+                                            <td class="font-semibold" x-text="k.name"></td>
+                                            <td x-text="k.leader"></td>
+                                            <td class="text-xs" x-text="k.area"></td>
+                                            <td><span class="badge badge-info" x-text="k.meetingDay"></span></td>
+                                            <td class="text-center" x-text="k.memberCount"></td>
+                                            <td class="text-xs" x-text="k.phone"></td>
+                                            <td>
+                                                <div class="flex gap-1">
+                                                    <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-eye"></i></button>
+                                                    <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-pen"></i></button>
+                                                    <button class="btn btn-outline-dark btn-sm text-red-600"><i class="fa-solid fa-trash"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal: Tambah Komsel -->
+                <template x-if="modalKomsel">
+                    <div class="modal-backdrop" @click.self="modalKomsel = false">
+                        <div class="modal-content" style="max-width: 600px;">
+                            <div class="modal-header">
+                                <h3 class="font-bold text-sm uppercase">Tambah Komsel Baru</h3>
+                                <button @click="modalKomsel = false"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Nama Komsel</label>
+                                        <input type="text" class="form-input" placeholder="Nama komsel">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Pemimpin Komsel</label>
+                                        <select class="form-select">
+                                            <option value="">Pilih Pemimpin</option>
+                                            <template x-for="j in jemaatList" :key="j.id">
+                                                <option :value="j.id" x-text="j.name"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Wilayah / Area</label>
+                                        <input type="text" class="form-input" placeholder="Wilayah komsel">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Hari Pertemuan</label>
+                                        <select class="form-select">
+                                            <option>Senin</option>
+                                            <option>Selasa</option>
+                                            <option>Rabu</option>
+                                            <option>Kamis</option>
+                                            <option>Jumat</option>
+                                            <option>Sabtu</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Telepon Pemimpin</label>
+                                        <input type="text" class="form-input" placeholder="08xxxxxxxxxx">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Keterangan</label>
+                                    <textarea class="form-textarea" rows="2"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-dark btn-sm" @click="modalKomsel = false">Batal</button>
+                                <button class="btn btn-dark btn-sm"><i class="fa-solid fa-save"></i> Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- Page: Kehadiran Jemaat -->
+            <!-- Laravel equivalent: @include('operator.kehadiran') -->
+            <!-- Route: /operator/kehadiran -->
+            <!-- ============================================ -->
+            <div x-show="page === 'kehadiran'" x-transition>
+
+                <!-- Form Input Kehadiran -->
                 <div class="card mb-6">
                     <div class="card-header flex items-center justify-between">
                         <span><i class="fa-solid fa-clipboard-check mr-2"></i>Pencatatan Kehadiran</span>
-                        <span class="badge badge-info" x-text="'Total: ' + absensiToday.length + ' hadir'"></span>
+                        <span class="badge badge-info" x-text="'Total: ' + absensiTotal + ' hadir'"></span>
                     </div>
                     <div class="card-body">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                             <div class="form-group mb-0">
                                 <label class="form-label">Jenis Ibadah</label>
                                 <select class="form-select" x-model="absensiType">
@@ -458,51 +834,100 @@
                                 <input type="date" class="form-input" x-model="absensiDate">
                             </div>
                             <div class="form-group mb-0">
-                                <label class="form-label">Cari Jemaat</label>
-                                <input type="text" class="form-input" placeholder="Ketik nama..." x-model="absensiSearchName">
+                                <label class="form-label">Jumlah Laki-laki</label>
+                                <input type="number" class="form-input" x-model.number="absensiLaki" min="0" placeholder="0">
+                            </div>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Jumlah Perempuan</label>
+                                <input type="number" class="form-input" x-model.number="absensiPerempuan" min="0" placeholder="0">
                             </div>
                         </div>
 
-                        <!-- Quick Attendance List -->
-                        <div class="overflow-x-auto">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th><input type="checkbox"></th>
-                                        <th>Nama Jemaat</th>
-                                        <th>Komsel</th>
-                                        <th>Kehadiran</th>
-                                        <th>Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template x-for="j in jemaatList" :key="j.id">
-                                        <tr>
-                                            <td><input type="checkbox" :checked="isPresent(j.id)" @change="togglePresent(j.id)"></td>
-                                            <td class="font-semibold" x-text="j.name"></td>
-                                            <td><span class="badge badge-info" x-text="j.komsel"></span></td>
-                                            <td>
-                                                <span class="badge" :class="isPresent(j.id) ? 'badge-success' : 'badge-danger'"
-                                                      x-text="isPresent(j.id) ? 'Hadir' : 'Tidak Hadir'"></span>
-                                            </td>
-                                            <td><input type="text" class="form-input text-xs py-1" placeholder="Keterangan..."></td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
+                        <!-- Summary -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                            <div class="stat-card">
+                                <div>
+                                    <p class="stat-label">Laki-laki</p>
+                                    <p class="stat-value" x-text="absensiLaki"></p>
+                                </div>
+                                <i class="fa-solid fa-mars stat-icon text-blue-100"></i>
+                            </div>
+                            <div class="stat-card">
+                                <div>
+                                    <p class="stat-label">Perempuan</p>
+                                    <p class="stat-value" x-text="absensiPerempuan"></p>
+                                </div>
+                                <i class="fa-solid fa-venus stat-icon text-pink-100"></i>
+                            </div>
+                            <div class="stat-card">
+                                <div>
+                                    <p class="stat-label">Total Kehadiran</p>
+                                    <p class="stat-value" x-text="absensiTotal"></p>
+                                </div>
+                                <i class="fa-solid fa-users stat-icon"></i>
+                            </div>
                         </div>
-                        <div class="mt-4 flex gap-2">
-                            <button class="btn btn-dark"><i class="fa-solid fa-save"></i> Simpan Absensi</button>
+
+                        <div class="form-group">
+                            <label class="form-label">Keterangan</label>
+                            <textarea class="form-textarea" rows="2" x-model="absensiKeterangan" placeholder="Catatan tambahan (opsional)..."></textarea>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button class="btn btn-dark" @click="simpanAbsensi()"><i class="fa-solid fa-save"></i> Simpan Kehadiran</button>
                             <button class="btn btn-outline-dark"><i class="fa-solid fa-file-export"></i> Export</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Rekap Kehadiran -->
+                <!-- Riwayat Kehadiran -->
+                <div class="card mb-6">
+                    <div class="card-header flex items-center justify-between">
+                        <span>Riwayat Kehadiran</span>
+                        <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Jenis Ibadah</th>
+                                        <th>Laki-laki</th>
+                                        <th>Perempuan</th>
+                                        <th>Total</th>
+                                        <th>Keterangan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="r in absensiRiwayat" :key="r.id">
+                                        <tr>
+                                            <td class="text-xs font-semibold" x-text="r.date"></td>
+                                            <td x-text="r.type"></td>
+                                            <td class="text-center" x-text="r.laki"></td>
+                                            <td class="text-center" x-text="r.perempuan"></td>
+                                            <td class="text-center font-bold" x-text="r.laki + r.perempuan"></td>
+                                            <td class="text-xs text-slate-500" x-text="r.keterangan || '-'"></td>
+                                            <td>
+                                                <div class="flex gap-1">
+                                                    <button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-pen"></i></button>
+                                                    <button class="btn btn-outline-dark btn-sm text-red-600"><i class="fa-solid fa-trash"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rekap Kehadiran Chart -->
                 <div class="card">
                     <div class="card-header">Rekap Kehadiran - 5 Minggu Terakhir</div>
                     <div class="card-body">
-                        <canvas id="absensiChart" height="150" x-init="$nextTick(() => initBarChart('absensiChart', ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4', 'Minggu 5'], [750, 820, 790, 856, 910], 'Kehadiran'))"></canvas>
+                        <canvas id="absensiChart" height="150" x-init="$nextTick(() => initAbsensiChart())"></canvas>
                     </div>
                 </div>
             </div>
@@ -513,12 +938,96 @@
             <!-- Route: /operator/pelayanan -->
             <!-- ============================================ -->
             <div x-show="page === 'pelayanan'" x-transition>
-                <!-- Tabs: Aktivis & Jadwal -->
-                <div class="flex gap-2 mb-6">
+                <!-- Tabs -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button class="btn btn-sm" :class="pelayananTab === 'jadwalIbadah' ? 'btn-dark' : 'btn-outline-dark'"
+                            @click="pelayananTab = 'jadwalIbadah'"><i class="fa-solid fa-calendar-days mr-1"></i> Jadwal Ibadah</button>
                     <button class="btn btn-sm" :class="pelayananTab === 'aktivis' ? 'btn-dark' : 'btn-outline-dark'"
-                            @click="pelayananTab = 'aktivis'">Data Aktivis</button>
+                            @click="pelayananTab = 'aktivis'"><i class="fa-solid fa-users-gear mr-1"></i> Data Aktivis</button>
                     <button class="btn btn-sm" :class="pelayananTab === 'jadwal' ? 'btn-dark' : 'btn-outline-dark'"
-                            @click="pelayananTab = 'jadwal'">Jadwal Tugas</button>
+                            @click="pelayananTab = 'jadwal'"><i class="fa-solid fa-list-check mr-1"></i> Jadwal Tugas</button>
+                </div>
+
+                <!-- Jadwal Ibadah Mingguan -->
+                <div x-show="pelayananTab === 'jadwalIbadah'">
+                    <!-- Weekly Overview Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                        <template x-for="day in ['Minggu', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']" :key="day">
+                            <template x-if="jadwalIbadah.filter(j => j.day === day).length > 0">
+                                <div class="card">
+                                    <div class="card-header flex items-center gap-2">
+                                        <i class="fa-solid fa-calendar-day text-accent"></i>
+                                        <span class="font-bold" x-text="'Hari ' + day"></span>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <template x-for="j in jadwalIbadah.filter(i => i.day === day)" :key="j.id">
+                                            <div class="px-4 py-3 border-b border-slate-50 last:border-0">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <p class="text-xs font-bold" x-text="j.name"></p>
+                                                        <p class="text-[11px] text-slate-500 mt-0.5">
+                                                            <i class="fa-regular fa-clock mr-1"></i><span x-text="j.time"></span>
+                                                        </p>
+                                                    <p class="text-[11px] text-slate-400">
+                                                            <i class="fa-solid fa-location-dot mr-1"></i><span x-text="j.location"></span>
+                                                        </p>
+                                                        <p class="text-[10px] text-slate-400 mt-0.5">
+                                                            <i class="fa-solid fa-repeat mr-1"></i><span x-text="j.repeat"></span>
+                                                        </p>
+                                                    </div>
+                                                    <span class="badge text-[10px]" :class="j.category === 'Ibadah Umum' ? 'badge-info' : j.category === 'Pemuda' ? 'badge-success' : j.category === 'Anak' ? 'badge-warning' : 'badge-info'" x-text="j.category"></span>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+
+                    <!-- Jadwal Ibadah Table -->
+                    <div class="card">
+                        <div class="card-header flex items-center justify-between">
+                            <span><i class="fa-solid fa-church mr-2"></i>Daftar Jadwal Ibadah</span>
+                            <span class="text-[10px] text-slate-400 uppercase">Dikelola oleh Manager</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Nama Ibadah</th>
+                                            <th>Hari</th>
+                                            <th>Waktu</th>
+                                            <th>Tempat</th>
+                                            <th>Kategori</th>
+                                            <th>Pengulangan</th>
+                                            <th>Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="(j, i) in jadwalIbadah" :key="j.id">
+                                            <tr>
+                                                <td x-text="i + 1"></td>
+                                                <td class="font-semibold" x-text="j.name"></td>
+                                                <td><span class="badge badge-info" x-text="j.day"></span></td>
+                                                <td class="text-xs font-mono" x-text="j.time"></td>
+                                                <td class="text-xs" x-text="j.location"></td>
+                                                <td>
+                                                    <span class="badge" :class="j.category === 'Ibadah Umum' ? 'badge-info' : j.category === 'Pemuda' ? 'badge-success' : j.category === 'Anak' ? 'badge-warning' : 'badge-info'" x-text="j.category"></span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" :class="j.repeat === 'Mingguan' ? 'badge-success' : j.repeat === 'Bulanan' ? 'badge-info' : j.repeat === 'Tahunan' ? 'badge-warning' : 'badge-danger'" x-text="j.repeat"></span>
+                                                </td>
+                                                <td class="text-xs text-slate-500" x-text="j.description || '-'"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Data Aktivis -->
@@ -620,7 +1129,7 @@
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
-                                    <label class="form-label">Pilih Jemaat</label>
+                                    <label class="form-label">Pilih Anggota</label>
                                     <select class="form-select">
                                         <template x-for="j in jemaatList"><option x-text="j.name"></option></template>
                                     </select>
@@ -672,9 +1181,9 @@
                         <div class="card-body">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div class="form-group">
-                                    <label class="form-label">Nama Jemaat</label>
+                                    <label class="form-label">Nama Anggota</label>
                                     <select class="form-select">
-                                        <option value="">Pilih Jemaat</option>
+                                        <option value="">Pilih Anggota</option>
                                         <template x-for="j in jemaatList"><option x-text="j.name"></option></template>
                                     </select>
                                 </div>
@@ -764,23 +1273,32 @@ function operatorApp() {
         page: 'dashboard',
         sidebarOpen: false,
         modalJemaat: false,
+        modalKeluarga: false,
+        modalKomsel: false,
         modalAktivis: false,
         modalJadwal: false,
         jemaatSearch: '',
         jemaatFilter: '',
+        jemaatKelompokFilter: '',
+        jemaatKomselFilter: '',
+        keluargaSearch: '',
+        selectedKeluarga: null,
         absensiType: 'Ibadah Raya Minggu',
         absensiDate: new Date().toISOString().split('T')[0],
-        absensiSearchName: '',
-        absensiToday: [1, 2, 3, 5, 7],
-        pelayananTab: 'aktivis',
+        absensiLaki: 0,
+        absensiPerempuan: 0,
+        absensiKeterangan: '',
+        pelayananTab: 'jadwalIbadah',
         suratTab: 'baptis',
 
         get pageTitle() {
             const titles = {
                 dashboard: 'Dashboard',
-                jemaat: 'Pendaftaran & Data Jemaat',
-                mutasi: 'Mutasi Jemaat',
-                absensi: 'Absensi Kehadiran',
+                keluarga: 'Kartu Keluarga',
+                jemaat: 'Pendaftaran & Data Anggota',
+                mutasi: 'Mutasi Anggota',
+                komsel: 'Manajemen Komsel',
+                kehadiran: 'Kehadiran Jemaat',
                 pelayanan: 'Administrasi Pelayanan',
                 surat: 'Surat Menyurat'
             };
@@ -789,30 +1307,67 @@ function operatorApp() {
 
         // ---- Data: Recent Activity ----
         recentActivity: [
-            { id: 1, icon: 'fa-user-plus', title: 'Pendaftaran Jemaat Baru', detail: 'Budi Santoso — Komsel Berkat', time: '2 menit lalu' },
-            { id: 2, icon: 'fa-clipboard-check', title: 'Absensi Ibadah Raya', detail: '856 dari 1240 jemaat hadir', time: '3 jam lalu' },
+            { id: 1, icon: 'fa-user-plus', title: 'Pendaftaran Anggota Baru', detail: 'Budi Santoso — Komsel Berkat', time: '2 menit lalu' },
+            { id: 2, icon: 'fa-clipboard-check', title: 'Absensi Ibadah Raya', detail: '856 dari 1240 anggota hadir', time: '3 jam lalu' },
             { id: 3, icon: 'fa-exchange-alt', title: 'Mutasi Masuk', detail: 'Kel. Sirait dari GBI Sentani', time: '5 jam lalu' },
             { id: 4, icon: 'fa-print', title: 'Cetak Surat Baptis', detail: 'No. SB/2026/03/001 — Rina M.', time: 'Kemarin' },
         ],
 
-        // ---- Data: Jemaat ----
+        // ---- Data: Anggota ----
         jemaatList: [
-            { id: 1, name: 'Budi Santoso', nik: '9171010101010001', gender: 'Laki-laki', dob: '15 Jan 1985', phone: '0812xxxxxxxx', komsel: 'Berkat', status: 'Aktif' },
-            { id: 2, name: 'Sari Wonda', nik: '9171010202020002', gender: 'Perempuan', dob: '22 Mar 1990', phone: '0813xxxxxxxx', komsel: 'Kasih', status: 'Aktif' },
-            { id: 3, name: 'Yohanis Kogoya', nik: '9171010303030003', gender: 'Laki-laki', dob: '08 Jul 1978', phone: '0852xxxxxxxx', komsel: 'Damai', status: 'Aktif' },
-            { id: 4, name: 'Martha Sirait', nik: '9171010404040004', gender: 'Perempuan', dob: '12 Nov 1995', phone: '0821xxxxxxxx', komsel: 'Berkat', status: 'Aktif' },
-            { id: 5, name: 'Daniel Wanimbo', nik: '9171010505050005', gender: 'Laki-laki', dob: '30 May 1982', phone: '0856xxxxxxxx', komsel: 'Kasih', status: 'Pindah' },
-            { id: 6, name: 'Grace Tabuni', nik: '9171010606060006', gender: 'Perempuan', dob: '03 Sep 1988', phone: '0878xxxxxxxx', komsel: 'Damai', status: 'Aktif' },
-            { id: 7, name: 'Petrus Wenda', nik: '9171010707070007', gender: 'Laki-laki', dob: '19 Feb 1975', phone: '0811xxxxxxxx', komsel: 'Berkat', status: 'Aktif' },
+            { id: 1, name: 'Budi Santoso', nik: '9171010101010001', gender: 'Laki-laki', dob: '15 Jan 1985', phone: '0812xxxxxxxx', komsel: 'Komsel Berkat', status: 'Aktif', keluargaId: 1, kelompok: 'Dewasa', hubungan: 'Kepala Keluarga' },
+            { id: 2, name: 'Sari Wonda', nik: '9171010202020002', gender: 'Perempuan', dob: '22 Mar 1990', phone: '0813xxxxxxxx', komsel: 'Komsel Kasih', status: 'Aktif', keluargaId: 1, kelompok: 'Dewasa', hubungan: 'Istri' },
+            { id: 3, name: 'Yohanis Kogoya', nik: '9171010303030003', gender: 'Laki-laki', dob: '08 Jul 1978', phone: '0852xxxxxxxx', komsel: 'Komsel Damai', status: 'Aktif', keluargaId: 2, kelompok: 'Dewasa', hubungan: 'Kepala Keluarga' },
+            { id: 4, name: 'Martha Sirait', nik: '9171010404040004', gender: 'Perempuan', dob: '12 Nov 1995', phone: '0821xxxxxxxx', komsel: 'Komsel Berkat', status: 'Aktif', keluargaId: 3, kelompok: 'Pemuda', hubungan: 'Kepala Keluarga' },
+            { id: 5, name: 'Daniel Wanimbo', nik: '9171010505050005', gender: 'Laki-laki', dob: '30 May 1982', phone: '0856xxxxxxxx', komsel: 'Komsel Kasih', status: 'Pindah', keluargaId: null, kelompok: 'Dewasa', hubungan: '-' },
+            { id: 6, name: 'Grace Tabuni', nik: '9171010606060006', gender: 'Perempuan', dob: '03 Sep 1988', phone: '0878xxxxxxxx', komsel: 'Komsel Damai', status: 'Aktif', keluargaId: 4, kelompok: 'Pemuda', hubungan: 'Kepala Keluarga' },
+            { id: 7, name: 'Petrus Wenda', nik: '9171010707070007', gender: 'Laki-laki', dob: '19 Feb 1975', phone: '0811xxxxxxxx', komsel: 'Komsel Berkat', status: 'Aktif', keluargaId: 5, kelompok: 'Dewasa', hubungan: 'Kepala Keluarga' },
+            { id: 8, name: 'Timotius Santoso', nik: '9171010808080008', gender: 'Laki-laki', dob: '05 Jun 2012', phone: '-', komsel: 'Komsel Berkat', status: 'Aktif', keluargaId: 1, kelompok: 'Sekolah Minggu', hubungan: 'Anak' },
+            { id: 9, name: 'Ruth Kogoya', nik: '9171010909090009', gender: 'Perempuan', dob: '18 Apr 1980', phone: '0853xxxxxxxx', komsel: 'Komsel Damai', status: 'Aktif', keluargaId: 2, kelompok: 'Dewasa', hubungan: 'Istri' },
+            { id: 10, name: 'Samuel Kogoya', nik: '9171011010100010', gender: 'Laki-laki', dob: '12 Aug 2010', phone: '-', komsel: 'Komsel Damai', status: 'Aktif', keluargaId: 2, kelompok: 'Sekolah Minggu', hubungan: 'Anak' },
         ],
 
         get filteredJemaat() {
             return this.jemaatList.filter(j => {
                 const matchSearch = !this.jemaatSearch || j.name.toLowerCase().includes(this.jemaatSearch.toLowerCase()) || j.nik.includes(this.jemaatSearch);
                 const matchFilter = !this.jemaatFilter || j.status === this.jemaatFilter;
-                return matchSearch && matchFilter;
+                const matchKelompok = !this.jemaatKelompokFilter || j.kelompok === this.jemaatKelompokFilter;
+                const matchKomsel = !this.jemaatKomselFilter || j.komsel === this.jemaatKomselFilter;
+                return matchSearch && matchFilter && matchKelompok && matchKomsel;
             });
         },
+
+        // ---- Data: Kartu Keluarga ----
+        keluargaList: [
+            { id: 1, noKK: '9171010101010000', kepala: 'Budi Santoso', alamat: 'Jl. Raya Doyo Baru No. 12', phone: '0812xxxxxxxx' },
+            { id: 2, noKK: '9171010303030000', kepala: 'Yohanis Kogoya', alamat: 'Jl. Gereja No. 5, Doyo Baru', phone: '0852xxxxxxxx' },
+            { id: 3, noKK: '9171010404040000', kepala: 'Martha Sirait', alamat: 'Jl. Kemiri RT 03/RW 02', phone: '0821xxxxxxxx' },
+            { id: 4, noKK: '9171010606060000', kepala: 'Grace Tabuni', alamat: 'Jl. Yos Sudarso No. 8', phone: '0878xxxxxxxx' },
+            { id: 5, noKK: '9171010707070000', kepala: 'Petrus Wenda', alamat: 'Kampung Doyo Lama', phone: '0811xxxxxxxx' },
+        ],
+
+        get filteredKeluarga() {
+            return this.keluargaList.filter(k => {
+                return !this.keluargaSearch || k.kepala.toLowerCase().includes(this.keluargaSearch.toLowerCase()) || k.noKK.includes(this.keluargaSearch);
+            });
+        },
+
+        getAnggotaKeluarga(keluargaId) {
+            return this.jemaatList.filter(j => j.keluargaId === keluargaId);
+        },
+
+        getKeluargaName(keluargaId) {
+            if (!keluargaId) return '-';
+            const k = this.keluargaList.find(k => k.id === keluargaId);
+            return k ? k.kepala : '-';
+        },
+
+        // ---- Data: Komsel ----
+        komselList: [
+            { id: 1, name: 'Komsel Berkat', leader: 'Budi Santoso', area: 'Doyo Baru Timur', memberCount: 15, meetingDay: 'Rabu', phone: '0812xxxxxxxx' },
+            { id: 2, name: 'Komsel Kasih', leader: 'Sari Wonda', area: 'Doyo Baru Barat', memberCount: 12, meetingDay: 'Kamis', phone: '0813xxxxxxxx' },
+            { id: 3, name: 'Komsel Damai', leader: 'Yohanis Kogoya', area: 'Doyo Lama', memberCount: 10, meetingDay: 'Jumat', phone: '0852xxxxxxxx' },
+        ],
 
         // ---- Data: Mutasi ----
         mutasiList: [
@@ -830,7 +1385,22 @@ function operatorApp() {
             { id: 5, name: 'John T.', ministry: 'Doa', role: 'Anggota', phone: '0856xxxxxxxx' },
         ],
 
-        // ---- Data: Jadwal Pelayanan ----
+        // ---- Data: Jadwal Ibadah ----
+        jadwalIbadah: [
+            { id: 1, name: 'Ibadah Raya Minggu I', day: 'Minggu', time: '07:00 - 09:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Mingguan', description: 'Ibadah pagi sesi pertama' },
+            { id: 2, name: 'Ibadah Raya Minggu II', day: 'Minggu', time: '09:30 - 11:30', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Mingguan', description: 'Ibadah pagi sesi kedua' },
+            { id: 3, name: 'Sekolah Minggu', day: 'Minggu', time: '07:00 - 09:00', location: 'Ruang SM', category: 'Anak', repeat: 'Mingguan', description: 'Kelas anak usia 3-12 tahun' },
+            { id: 4, name: 'Ibadah Doa', day: 'Rabu', time: '18:00 - 20:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Mingguan', description: 'Ibadah doa bersama' },
+            { id: 5, name: 'Ibadah Kaum Wanita', day: 'Kamis', time: '10:00 - 12:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Mingguan', description: 'Persekutuan kaum wanita' },
+            { id: 6, name: 'Ibadah Pemuda', day: 'Sabtu', time: '17:00 - 19:00', location: 'Gedung Utama', category: 'Pemuda', repeat: 'Mingguan', description: 'Ibadah dan fellowship pemuda' },
+            { id: 7, name: 'Latihan Paduan Suara', day: 'Jumat', time: '18:00 - 20:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Mingguan', description: 'Latihan PS untuk ibadah Minggu' },
+            { id: 8, name: 'Komsel / Pertemuan Sel', day: 'Rabu', time: '19:00 - 21:00', location: 'Rumah Anggota', category: 'Komsel', repeat: 'Mingguan', description: 'Pertemuan kelompok sel mingguan (jadwal bervariasi per komsel)' },
+            { id: 9, name: 'Perjamuan Kudus', day: 'Minggu', time: '07:00 - 09:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Bulanan', description: 'Ibadah perjamuan kudus setiap minggu pertama' },
+            { id: 10, name: 'Ibadah Perayaan Paskah', day: 'Minggu', time: '07:00 - 12:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Tahunan', description: 'Ibadah perayaan kebangkitan Kristus' },
+            { id: 11, name: 'KKR Kebangunan Rohani', day: 'Sabtu', time: '17:00 - 21:00', location: 'Gedung Utama', category: 'Ibadah Umum', repeat: 'Sekali', description: 'KKR dengan pembicara Pdt. David — 15 Mar 2026' },
+        ],
+
+        // ---- Data: Jadwal Tugas Pelayanan ----
         jadwalPelayanan: [
             { id: 1, date: '09 Mar 2026', service: 'Ibadah Raya I', wl: 'Samuel K.', singer: 'Rina M., Grace T.', music: 'David P.', sound: 'Budi S.', usher: 'Esther W.' },
             { id: 2, date: '09 Mar 2026', service: 'Ibadah Raya II', wl: 'Martha S.', singer: 'John T., Sari W.', music: 'Petrus W.', sound: 'David P.', usher: 'Grace T.' },
@@ -845,16 +1415,64 @@ function operatorApp() {
             { id: 4, type: 'Surat Pindah', name: 'Daniel Wanimbo', no: 'SP/2026/02/014', date: '25 Feb 2026' },
         ],
 
-        // ---- Absensi Methods ----
-        isPresent(id) {
-            return this.absensiToday.includes(id);
+        // ---- Data: Riwayat Kehadiran ----
+        absensiRiwayat: [
+            { id: 1, date: '02 Mar 2026', type: 'Ibadah Raya Minggu', laki: 420, perempuan: 490, keterangan: 'Ibadah gabungan' },
+            { id: 2, date: '02 Mar 2026', type: 'Sekolah Minggu', laki: 85, perempuan: 78, keterangan: '' },
+            { id: 3, date: '23 Feb 2026', type: 'Ibadah Raya Minggu', laki: 390, perempuan: 466, keterangan: '' },
+            { id: 4, date: '23 Feb 2026', type: 'Sekolah Minggu', laki: 80, perempuan: 72, keterangan: '' },
+            { id: 5, date: '19 Feb 2026', type: 'Ibadah Doa', laki: 120, perempuan: 145, keterangan: 'Doa puasa' },
+            { id: 6, date: '16 Feb 2026', type: 'Ibadah Raya Minggu', laki: 380, perempuan: 440, keterangan: '' },
+            { id: 7, date: '16 Feb 2026', type: 'Sekolah Minggu', laki: 75, perempuan: 70, keterangan: '' },
+        ],
+
+        // ---- Absensi Computed & Methods ----
+        get absensiTotal() {
+            return (this.absensiLaki || 0) + (this.absensiPerempuan || 0);
         },
-        togglePresent(id) {
-            if (this.isPresent(id)) {
-                this.absensiToday = this.absensiToday.filter(i => i !== id);
-            } else {
-                this.absensiToday.push(id);
+
+        simpanAbsensi() {
+            if (!this.absensiLaki && !this.absensiPerempuan) {
+                alert('Masukkan jumlah kehadiran terlebih dahulu.');
+                return;
             }
+            const newId = this.absensiRiwayat.length + 1;
+            const dateObj = new Date(this.absensiDate);
+            const formatted = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            this.absensiRiwayat.unshift({
+                id: newId,
+                date: formatted,
+                type: this.absensiType,
+                laki: this.absensiLaki || 0,
+                perempuan: this.absensiPerempuan || 0,
+                keterangan: this.absensiKeterangan
+            });
+            this.absensiLaki = 0;
+            this.absensiPerempuan = 0;
+            this.absensiKeterangan = '';
+        },
+
+        initAbsensiChart() {
+            const ctx = document.getElementById('absensiChart');
+            if (!ctx) return;
+            new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['16 Feb', '23 Feb', '02 Mar', '09 Mar', '16 Mar'],
+                    datasets: [
+                        { label: 'Laki-laki', data: [380, 390, 420, 0, 0], backgroundColor: '#2563eb' },
+                        { label: 'Perempuan', data: [440, 466, 490, 0, 0], backgroundColor: '#64748b' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+                    scales: {
+                        y: { beginAtZero: true, stacked: true, grid: { color: '#f1f5f9' } },
+                        x: { stacked: true, grid: { display: false } }
+                    }
+                }
+            });
         }
     };
 }
